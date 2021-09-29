@@ -246,7 +246,7 @@ GameObject:
   - component: {fileID: 1443807947}
   - component: {fileID: 1443807946}
   - component: {fileID: 1443807945}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -393,7 +393,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2aa912106be436945916161372350c33, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  projectileObject: {fileID: 9178524413137771912, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
+  shootEffectObject: {fileID: 9038702134263665541, guid: 2628016f755191240b9b320beef71667, type: 3}
+  shootLayerMask:
+    serializedVersion: 2
+    m_Bits: 55
+  shootDistance: 50
 --- !u!1 &1648392541
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,7 +476,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1648392541}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -2.5, z: 0}
+  m_LocalPosition: {x: 0, y: -2.5, z: -1}
   m_LocalScale: {x: 50, y: 5, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -504,63 +508,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!1001 &2003952903
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 9178524413137771912, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_Name
-      value: Projectile
-      objectReference: {fileID: 0}
-    - target: {fileID: 9178524413137771918, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_RootOrder
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 9178524413137771918, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -0.94
-      objectReference: {fileID: 0}
-    - target: {fileID: 9178524413137771918, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.43
-      objectReference: {fileID: 0}
-    - target: {fileID: 9178524413137771918, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9178524413137771918, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9178524413137771918, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9178524413137771918, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9178524413137771918, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9178524413137771918, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9178524413137771918, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9178524413137771918, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 0a8894281efc8ba42a3049be557989ab, type: 3}
 --- !u!1 &2051196463
 GameObject:
   m_ObjectHideFlags: 0
@@ -573,6 +520,7 @@ GameObject:
   - component: {fileID: 2051196465}
   - component: {fileID: 2051196464}
   - component: {fileID: 2051196467}
+  - component: {fileID: 2051196468}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -677,3 +625,16 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+--- !u!114 &2051196468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2051196463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85e9b898019624d47a24aac08ee74d29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerTransform: {fileID: 1443807943}
