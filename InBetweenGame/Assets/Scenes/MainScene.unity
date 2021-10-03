@@ -398,6 +398,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 55
   shootDistance: 50
+  maxShootEnergy: 10
+  ShootEnergyPenalty: 2
+  ShootenergyRechargeRate: 0.8
 --- !u!1 &1648392541
 GameObject:
   m_ObjectHideFlags: 0
