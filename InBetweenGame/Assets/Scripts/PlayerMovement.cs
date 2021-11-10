@@ -9,6 +9,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isJumping = false;
     private bool alreadyJumped = false;
+    private bool damageCooldown = false;
 
     private Vector2 moveVector;
     private Vector2 currentVelocity;
@@ -16,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Rigidbody2D playerRigidBody;
     [SerializeField] private float movementSpeed = 3f;
     [SerializeField] private float jumpForce = 300f;
+    [SerializeField] private float knockbackForce; // The amount of knockback the player gets when damaged
 
     private void Start()
     {
@@ -24,6 +26,8 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (damageCooldown) { return; } // No movement while player is being damaged
+
         moveHorizontal = Input.GetAxis("Horizontal");
         moveVertical = Input.GetAxis("Vertical");
         currentVelocity = playerRigidBody.velocity;
@@ -53,7 +57,6 @@ public class PlayerMovement : MonoBehaviour
             alreadyJumped = true;
         }
     }
-
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
