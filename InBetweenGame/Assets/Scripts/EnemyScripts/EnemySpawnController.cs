@@ -25,8 +25,8 @@ public class EnemySpawnController : MonoBehaviour
         while (!Input.GetKeyDown(KeyCode.Escape))
         {
             yield return new WaitForSeconds(3f);
-            GameObject newEnemy = Instantiate(projectileEnemyObject, spawnPosition, Quaternion.identity);
-            newEnemy.GetComponent<ProjectileEnemyController>().SetPlayerTransform(playerTransform);
+            GameObject newEnemy = Instantiate(basicEnemyObject, spawnPosition, Quaternion.identity);
+            newEnemy.GetComponent<BasicEnemyController>().playerTransform = playerTransform;
         }
     }
 }

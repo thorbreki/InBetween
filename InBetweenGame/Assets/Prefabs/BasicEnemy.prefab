@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3495945601361794820}
   - component: {fileID: 7249771453206446033}
   - component: {fileID: 6697271736491761183}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BasicEnemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -120,7 +120,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2014031779790773298}
   - component: {fileID: 4823088999894854534}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SquareSprite
   m_TagString: Untagged
   m_Icon: {fileID: 0}
