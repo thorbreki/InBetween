@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BasicEnemyController : MonoBehaviour
 {
-    public Transform playerTransform; // Set by the parent spawner
+    [HideInInspector] public Transform playerTransform; // Set by the parent spawner
     [SerializeField] private float movementSpeed;
     [SerializeField] private Rigidbody2D rb;
 
