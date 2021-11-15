@@ -20,6 +20,7 @@ public class StomperController : MonoBehaviour
 
     private void Start()
     {
+        // TODO: REMOVE THE FUCKING CODE YOU JUST WROTE AND MAKE THEM ROAM AROND FREELY LIKE TOTAL ASSHATS, MUCH EASIER CODE, AND TAKES LESS TIME TO IMPLEMENT
         desiredSpot = new Vector3(0, 0, transform.position.z);
 
         movementSpeed = Random.Range(minMovementSpeed, maxMovementSpeed);
