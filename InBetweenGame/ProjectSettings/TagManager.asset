@@ -8,6 +8,7 @@ TagManager:
   - BasicEnemy
   - Enemy
   - Projectile
+  - StomperBorder
   layers:
   - Default
   - TransparentFX

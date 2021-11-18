@@ -128,7 +128,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -161,5 +161,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 0}
   rigidBody: {fileID: 8983535167100375048}
-  minMovementSpeed: 3
-  maxMovementSpeed: 8
+  minMovementSpeed: 1
+  maxMovementSpeed: 3
+  minDesiredX: -24
+  maxDesiredX: 24
+  minDesiredY: 4
+  maxDesiredY: 14
+  minAttackForce: 20
+  maxAttackForce: 30
