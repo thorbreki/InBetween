@@ -756,9 +756,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 778572589}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: LevelBorders
-  m_TagString: Untagged
+  m_TagString: LevelBorder
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -905,9 +905,9 @@ GameObject:
   m_Component:
   - component: {fileID: 864204586}
   - component: {fileID: 864204587}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: RightBorder
-  m_TagString: Untagged
+  m_TagString: LevelBorder
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -962,7 +962,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1062279760}
   - component: {fileID: 1062279761}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: BottomBorder
   m_TagString: StomperBorder
   m_Icon: {fileID: 0}
@@ -1318,7 +1318,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1321687311
 Transform:
   m_ObjectHideFlags: 0
@@ -1699,9 +1699,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1769755817}
   - component: {fileID: 1769755818}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: LeftBorder
-  m_TagString: Untagged
+  m_TagString: LevelBorder
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -2038,9 +2038,9 @@ GameObject:
   m_Component:
   - component: {fileID: 2049795206}
   - component: {fileID: 2049795207}
-  m_Layer: 10
+  m_Layer: 12
   m_Name: TopBorder
-  m_TagString: Untagged
+  m_TagString: LevelBorder
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
@@ -2215,4 +2215,71 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 1443807943}
+  cameraComponent: {fileID: 2051196465}
   yOffset: 4
+  zoomSpeed: 20
+--- !u!1001 &580315104660100440
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 580315104921005744, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_RootOrder
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005744, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.5447509
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005744, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.6013253
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005744, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005744, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005744, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005744, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005744, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005744, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005744, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005744, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005758, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_Name
+      value: RollerEnemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 580315104921005758, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 5498907766881034242, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}
+      propertyPath: playerTransform
+      value: 
+      objectReference: {fileID: 1443807943}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 16ee18cea812a2b4488e16953d3126a4, type: 3}

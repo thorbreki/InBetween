@@ -21,13 +21,13 @@ public class ProjectileEnemyController : MonoBehaviour
 
     private float projectileSpeed; // The speed of the projectiles this enemy shoots
     private float projectileCooldown; // The seconds between the enemy can shoot projectiles
+    private int targetSideOfPlayer; // The enemy will always want to be either side of the player. 0 = left of player, 1 = right of player
 
     private Transform playerTransform;
     private float targetDistanceFromGround;
     private float targetXDistanceFromPlayer;
 
-    private Vector3 toPlayerVector; // The vector which defines where the enemy moves
-    private float currDistanceFromPlayer; // The actual current distance from the player (only check on x-positions)
+    private Vector3 toPlayerVector; // The vector which defines where the enemy
 
 
     private void Start()
@@ -38,7 +38,10 @@ public class ProjectileEnemyController : MonoBehaviour
         projectileSpeed = Random.Range(minProjectileSpeed, maxProjectileSpeed); // Initializing the speed of the projectiles this enemy shoots
         projectileCooldown = Random.Range(minProjectileCooldown, maxProjectileCooldown); // Initializing how fast the enemy can shoot
 
-        toPlayerVector = Vector3.zero; // Initialize the vector so it can be used
+        targetSideOfPlayer = Random.Range(0, 2);
+
+        // Initialize the vectors so they can be used
+        toPlayerVector = Vector3.zero;
 
         StartCoroutine("ShootPlayerCor");
     }
@@ -72,40 +75,15 @@ public class ProjectileEnemyController : MonoBehaviour
     /// </summary>
     private void SetUpMovement()
     {
-        // Set the value for the y-movement of the enemy
-        if (transform.position.y < (targetDistanceFromGround - 0.5f)) // If the enemy is farther from the ground than it wants to be
-        {
-            toPlayerVector.y = 1;
-            rigidBody.velocity = toPlayerVector.normalized * movementSpeed;
-        }
-        else if (transform.position.y > (targetDistanceFromGround + 0.5f)) // If the enemy is closer to the ground than it wants to be
-        {
-            toPlayerVector.y = -1;
-        }
-        else // If the enemy is happy about the distance from the ground
-        {
-            toPlayerVector.y = 0;
-        }
-
-        // Set the value for the x-movement of the enemy
-        currDistanceFromPlayer = Mathf.Abs(transform.position.x - playerTransform.position.x);
-        if (currDistanceFromPlayer < (targetXDistanceFromPlayer - 0.2f)) // If the enemy is closer from the player than it wants
-        {
-            toPlayerVector.x = transform.position.x > playerTransform.position.x ? 1 : -1; // Go right if enemy is to the right of player, else left
-        }
-        else if (currDistanceFromPlayer > (targetXDistanceFromPlayer + 0.2f)) // If the enemy is farther from the player than it wants
-        {
-            toPlayerVector.x = transform.position.x > playerTransform.position.x ? -1 : 1; // Go left if enemy is to the right of player, else right
-        }
-        else // The enemy is happy :)
-        {
-            toPlayerVector.x = 0;
-        }
+        // The target x position will now be randomly right or left side of the player always
+        float targetXPosition = targetSideOfPlayer == 1 ? playerTransform.position.x + targetXDistanceFromPlayer : playerTransform.position.x - targetXDistanceFromPlayer;
+        toPlayerVector.x = targetXPosition - transform.position.x;
+        toPlayerVector.y = targetDistanceFromGround - transform.position.y;
     }
 
     private void MoveToProximityOfPlayer()
     {
-        rigidBody.velocity = toPlayerVector * movementSpeed;
+        rigidBody.velocity = toPlayerVector.normalized * movementSpeed;
     }
 
     private IEnumerator ShootPlayerCor()

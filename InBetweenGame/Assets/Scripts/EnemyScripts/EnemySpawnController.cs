@@ -10,6 +10,7 @@ public class EnemySpawnController : MonoBehaviour
     [SerializeField] private GameObject basicEnemyObject;
     [SerializeField] private GameObject projectileEnemyObject;
     [SerializeField] private GameObject stomperEnemyObject;
+    [SerializeField] private GameObject rollerEnemyObject;
 
     [Header("Enemy Spawning Attributes")]
     [SerializeField] private float spawnYLevel; // Where on the y-axis will the enemies spawn
@@ -44,7 +45,7 @@ public class EnemySpawnController : MonoBehaviour
     {
         while (!Input.GetKey(KeyCode.Escape))
         {
-            int randomEnemyNumber = Random.Range(1, 4); // The number which will decide which enemy type gets spawned
+            int randomEnemyNumber = Random.Range(1, 5); // The number which will decide which enemy type gets spawned
             GameObject newEnemy;
 
             switch (randomEnemyNumber)
@@ -57,9 +58,13 @@ public class EnemySpawnController : MonoBehaviour
                     newEnemy = SpawnEnemy(projectileEnemyObject);
                     newEnemy.GetComponent<ProjectileEnemyController>().SetPlayerTransform(playerTransform);
                     break;
-                default: // When the value is 3
+                case 3:
                     newEnemy = SpawnEnemy(stomperEnemyObject);
                     newEnemy.GetComponent<StomperController>().playerTransform = playerTransform;
+                    break;
+                default: // When the value is 4
+                    newEnemy = SpawnEnemy(rollerEnemyObject);
+                    newEnemy.GetComponent<RollerEnemyController>().playerTransform = playerTransform;
                     break;
             }
             yield return new WaitForSeconds(spawnCooldown);
@@ -82,6 +87,5 @@ public class EnemySpawnController : MonoBehaviour
             yield return new WaitForSeconds(speedUpCoolDownSec);
             spawnCooldown -= spawningSpeedUp; // Actually speed up the spawner
         }
-
     }
 }

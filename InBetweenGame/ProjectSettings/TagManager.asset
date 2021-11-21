@@ -8,7 +8,7 @@ TagManager:
   - BasicEnemy
   - Enemy
   - Projectile
-  - StomperBorder
+  - LevelBorder
   layers:
   - Default
   - TransparentFX
@@ -21,8 +21,8 @@ TagManager:
   - BasicEnemy
   - ProjectileEnemy
   - StomperEnemy
-  - 
-  - 
+  - RollerEnemy
+  - LevelBorder
   - 
   - 
   - 

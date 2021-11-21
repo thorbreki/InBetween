@@ -56,7 +56,6 @@ public class StomperController : MonoBehaviour
         while (true)
         {
             // Decide on a random direction
-            print("Choosing a new direction!");
             desiredDirection.x = Random.Range(-5, 5);
             desiredDirection.y = Random.Range(-5, 5);
             rigidBody.velocity = desiredDirection.normalized * movementSpeed;
@@ -76,26 +75,4 @@ public class StomperController : MonoBehaviour
         yield return new WaitForSeconds(3f);
         moveCor = StartCoroutine(MoveToDesiredPos());
     }
-
-    //private void OnTriggerEnter2D(Collider2D other)
-    //{
-    //    print("TRIGGERED!");
-    //    if (!other.CompareTag("StomperBorder")) { return; } // if this enemy is not colliding with bottom stomper border, then return
-
-    //    if (moveCor == null) { return; } // If this enemy is not moving (aka attacking) then we will not care
-
-    //    desiredDirection.y = 5f; // Make the enemy want to go up
-    //    rigidBody.velocity = desiredDirection.normalized * movementSpeed;
-
-    //}
-
-    //private void OnTriggerStay2D(Collider2D other)
-    //{
-    //    if (!other.CompareTag("StomperBorder")) { return; } // if this enemy is not colliding with bottom stomper border, then return
-
-    //    if (moveCor == null) { return; } // If this enemy is not moving (aka attacking) then we will not care
-
-    //    desiredDirection.y = 5f; // Make the enemy want to go up
-
-    //}
 }
