@@ -34,7 +34,7 @@ public class EnemySpawnController : MonoBehaviour
 
     private void Start()
     {
-        spawnPosition = new Vector3(Random.Range(minXSpawn, maxXSpawn), spawnYLevel, transform.position.z);
+        spawnPosition = new Vector3(0, spawnYLevel, transform.position.z);
         spawnCooldown = beginningSpawningCooldown;
         StartCoroutine(spawnEnemies()); // Start spawning enemies!
         StartCoroutine(IncreaseSpawningCooldown()); // Start speeding up!
@@ -73,6 +73,7 @@ public class EnemySpawnController : MonoBehaviour
 
     private GameObject SpawnEnemy(GameObject newEnemyObject)
     {
+        spawnPosition.x = Random.Range(minXSpawn, maxXSpawn);
         return Instantiate(newEnemyObject, spawnPosition, Quaternion.identity);
     }
 

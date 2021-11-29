@@ -48,7 +48,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 0}
-  movementSpeed: 2
+  minMovementSpeed: 2
+  maxMovementSpeed: 4
   rb: {fileID: 7249771453206446033}
 --- !u!61 &3495945601361794820
 BoxCollider2D:
@@ -109,6 +110,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 316ac2a7d26c4f24482ccab8343d1e38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boxCollider: {fileID: 3495945601361794820}
+  spriteRenderer: {fileID: 4823088999894854534}
+  coinObject: {fileID: 761656200601707831, guid: a7fd4ed7b36d4da4abccdb4ea3299bc7, type: 3}
   maxHealth: 3
 --- !u!1 &5904996327495744958
 GameObject:

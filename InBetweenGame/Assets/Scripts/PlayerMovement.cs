@@ -28,8 +28,8 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float staminaDepletionRate; // How fast the stamina is spent
     [SerializeField] private float staminaRechargeRate; // How fast the stamina recharges
     [SerializeField] private float runningSpeed; // How fast the player moves when running
-
     [HideInInspector] public float stamina; // The stamina the player has currently
+    private bool allowedToRun = true; // This is primarily used for when player depletes the stamina and therefore is not allowed to run after that 
 
     private void Start()
     {
@@ -75,14 +75,26 @@ public class PlayerMovement : MonoBehaviour
         bool isPlayerMoving = moveHorizontal != 0f;
         bool isPlayerRunning = isPlayerMoving && Input.GetKey(KeyCode.LeftShift);
 
-        if (isPlayerRunning && stamina > 0)
+        if (isPlayerRunning && allowedToRun)
         {
             moveVector.x = moveHorizontal * runningSpeed;
             HandlePlayerRunning();
+
+            // When stamina is depleted, the player is not allowed to run again until he stops pressing on the right mouse button
+            if (stamina <= 0f)
+            {
+                allowedToRun = false;
+            }
         } else
         {
             moveVector.x = moveHorizontal * movementSpeed;
             HandlePlayerWalking(isPlayerMoving);
+
+            // When the player stops pressing on the right mouse button after depleting the stamina
+            if (!allowedToRun && Input.GetKeyUp(KeyCode.LeftShift))
+            {
+                allowedToRun = true; // Then they are finally able to run again, yay!
+            }
         }
     }
 

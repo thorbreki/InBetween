@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class RollerEnemyController : MonoBehaviour
 {
-    [HideInInspector] public Transform playerTransform;
+    public Transform playerTransform;
 
     [SerializeField] Rigidbody2D rigidBody; // The Roller's rigidBody component
 
@@ -16,9 +16,19 @@ public class RollerEnemyController : MonoBehaviour
     [SerializeField] private float minMovementSpeed;
     [SerializeField] private float maxMovementSpeed;
 
+    // How long does the roller have to wait before able to roll again
+    [SerializeField] private float minMovementCooldown;
+    [SerializeField] private float maxMovementCooldown;
+
     private float movementForce; // How much force is added to the Roller when trying to roll into the player
     private float movementSpeedLimit; // How fast the Roller can go before stop being able to add force to itself (its maximum speed)
-    private bool isSpeedingUp; // A useful booleans which tells whether or not the enemy is speeding up or not
+
+
+    // SHIELD FUNCTIONALITY
+    private ShieldController shieldControllerScript; // The shield's controller script to know important info
+    private bool isParalyzed = false;
+    private Coroutine paralyzeCoroutine; // Coroutine object for when the enemy gets paralyzed by the shield
+    private Vector2 knockBackVector; // The vector that knocks the enemy back
 
     private Coroutine attackPlayerCor;
 
@@ -33,31 +43,57 @@ public class RollerEnemyController : MonoBehaviour
         attackPlayerVector = Vector2.zero; // Initialize the vector
     }
 
+    /// <summary>
+    /// Basic Enemy gets knocked back and paralyzed when hit with the shield
+    /// </summary>
+    /// <param name="collision"></param>
+    private void OnShieldCollision(Collision2D collision)
+    {
+        if (shieldControllerScript == null) { shieldControllerScript = collision.gameObject.GetComponent<ShieldController>(); } // Get the shield controller script if not already
+
+        // Paralyze the Rolller
+        if (paralyzeCoroutine != null) { StopCoroutine(paralyzeCoroutine); } // Stop previous paralyzation if it is currently active
+        paralyzeCoroutine = StartCoroutine(ParalyzeCor(shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
+
+        // Knock back the roller
+        knockBackVector = transform.position - collision.transform.position; // Now it is known what direction this enemy must go in
+        rigidBody.AddForce(knockBackVector.normalized * shieldControllerScript.enemyKnockbackForce, ForceMode2D.Impulse);
+
+        // Call the playercombat script through the shield object to make the player lose the correct amount of energy
+        shieldControllerScript.playerCombatScript.OnShieldProtect();
+    }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.transform.CompareTag("Shield"))
+        {
+            OnShieldCollision(collision);
+        }
+
+
         // When Roller speeds up into a wall, it must stop trying to move and start over
-        if (collision.transform.CompareTag("LevelBorder") && isSpeedingIntoAWall()) // The Roller just bumped into a wall but is still trying to speed up
+        else if (collision.transform.CompareTag("LevelBorder") && isSpeedingIntoAWall()) // The Roller just bumped into a wall but is still trying to speed up
         {
             print("Whoops, just bumped into a wall. Starting over :)");
             if (attackPlayerCor != null) { StopCoroutine(attackPlayerCor); }
             attackPlayerCor = StartCoroutine(AttackPlayerCoroutine());
         }
 
-
-        // Start trying to attack the player
-        if (attackPlayerCor == null) { attackPlayerCor = StartCoroutine(AttackPlayerCoroutine()); }
+        // This code runs when the Roller lands on the ground for the first time, thus starting the movement process
+        else if (collision.transform.CompareTag("Ground") && attackPlayerCor == null)
+        {
+            attackPlayerCor = StartCoroutine(AttackPlayerCoroutine());
+        }
     }
 
     private IEnumerator AttackPlayerCoroutine()
     {
         while (true)
         {
-            yield return new WaitForSeconds(Random.Range(2f, 7f)); // First the enemy waits for a random amount of time
+            yield return new WaitForSeconds(Random.Range(minMovementCooldown, maxMovementCooldown)); // First the enemy waits for a random amount of time
 
             bool isLeftOfPlayer = transform.position.x < playerTransform.position.x; // Know this seperately in order to evaluate whether Roller has already passed the Player
             attackPlayerVector.x = isLeftOfPlayer ? movementForce : -movementForce; // the x force of the attackVector is the only one that matters
-            print("Started attacking!");
             while (Mathf.Abs(rigidBody.velocity.x) < movementSpeedLimit) // This loop runs until the Roller achieves maximum speed
             {
                 rigidBody.AddForce(attackPlayerVector); // Add force over time
@@ -65,8 +101,19 @@ public class RollerEnemyController : MonoBehaviour
                 yield return null; // Just wait until next frame
             }
             attackPlayerVector.x = 0; // Setting this to zero so it's completely known that this Roller is not trying to move
-            print("Ended attacking!");
         }
+    }
+
+    private IEnumerator ParalyzeCor(float secondsOfParalyzation)
+    {
+
+        // Make sure all movement and attacks are completely stopped
+        if (attackPlayerCor != null) { StopCoroutine(attackPlayerCor); }
+        attackPlayerVector.x = 0; attackPlayerVector.y = 0;
+        rigidBody.velocity = attackPlayerVector;
+
+        yield return new WaitForSeconds(secondsOfParalyzation);
+        attackPlayerCor = StartCoroutine(AttackPlayerCoroutine()); // Start moving again!
     }
 
     private bool isSpeedingIntoAWall()

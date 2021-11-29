@@ -4,22 +4,30 @@ using UnityEngine;
 
 public class StomperController : MonoBehaviour
 {
-    [HideInInspector] public Transform playerTransform;
+    public Transform playerTransform;
 
+    [Header("Components and Objects")]
     [SerializeField] private Rigidbody2D rigidBody;
+    [SerializeField] private GameObject indicatorObject;
+
+    [Header("Movement Attributes")]
     [SerializeField] private float minMovementSpeed;
     [SerializeField] private float maxMovementSpeed;
 
-    [SerializeField] private float minDesiredX = -24f;
-    [SerializeField] private float maxDesiredX = 24f;
-    [SerializeField] private float minDesiredY = 4f;
-    [SerializeField] private float maxDesiredY = 14f;
-
+    [Header("Attack Attributes")]
     [SerializeField] private float minAttackForce; // The minimum speed the enemy goes down to kill
     [SerializeField] private float maxAttackForce; // The maximum speed the enemy goes down to kill
 
+    private GameObject indicator; // The transform component of the indicator object
+
     private float movementSpeed;
     private float attackForce;
+
+    // SHIELD FUNCTIONALITY
+    private ShieldController shieldControllerScript; // The shield's controller script to know important info
+    private bool isParalyzed = false;
+    private Coroutine paralyzeCoroutine; // Coroutine object for when the enemy gets paralyzed by the shield
+    private Vector2 knockBackVector; // The vector that knocks the enemy back
 
     private Vector2 desiredDirection;
     private Vector2 attackVector;
@@ -29,7 +37,11 @@ public class StomperController : MonoBehaviour
 
     private void Start()
     {
+        // Initialize vectors
         desiredDirection = Vector2.one;
+        knockBackVector = Vector2.zero;
+
+        indicator = Instantiate(indicatorObject, transform.position, Quaternion.identity);
 
         movementSpeed = Random.Range(minMovementSpeed, maxMovementSpeed);
         attackForce = Random.Range(minAttackForce, maxAttackForce);
@@ -40,7 +52,10 @@ public class StomperController : MonoBehaviour
 
     private void Update()
     {
-        if (playerTransform == null) { return; }
+        indicator.transform.position = transform.position; // Always update the indicator object's position
+
+        if (playerTransform == null || isParalyzed) { return; }
+
 
         if (Mathf.Abs(playerTransform.position.x - transform.position.x) <= 0.99f)
         {
@@ -65,6 +80,7 @@ public class StomperController : MonoBehaviour
 
     private IEnumerator AttackPlayer()
     {
+        print("Attacking!");
         yield return new WaitForSeconds(0.1f);
         desiredDirection.x = 0;
         desiredDirection.y = 0;
@@ -74,5 +90,54 @@ public class StomperController : MonoBehaviour
 
         yield return new WaitForSeconds(3f);
         moveCor = StartCoroutine(MoveToDesiredPos());
+    }
+
+
+    /// <summary>
+    /// Basic Enemy gets knocked back and paralyzed when hit with the shield
+    /// </summary>
+    /// <param name="collision"></param>
+    private void OnShieldCollision(Collision2D collision)
+    {
+        if (shieldControllerScript == null) { shieldControllerScript = collision.gameObject.GetComponent<ShieldController>(); } // Get the shield controller script if not already
+
+        if (paralyzeCoroutine != null) { StopCoroutine(paralyzeCoroutine); } // Stop previous paralyzation if it is currently active
+        paralyzeCoroutine = StartCoroutine(ParalyzeCor(shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
+
+        knockBackVector = transform.position - collision.transform.position; // Now it is known what direction this enemy must go in
+        rigidBody.AddForce(knockBackVector.normalized * shieldControllerScript.enemyKnockbackForce, ForceMode2D.Impulse);
+
+        // Call the playercombat script through the shield object to make the player lose the correct amount of energy
+        shieldControllerScript.playerCombatScript.OnShieldProtect();
+    }
+
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.transform.CompareTag("Shield"))
+        {
+            OnShieldCollision(collision);
+        }
+    }
+
+    private IEnumerator ParalyzeCor(float secondsOfParalyzation)
+    {
+        isParalyzed = true;
+
+        // Make sure all movement and attacks are completely stopped
+        if (moveCor != null) { StopCoroutine(moveCor); }
+        if (attackPlayerCor != null) { StopCoroutine(attackPlayerCor); }
+        desiredDirection.x = 0; desiredDirection.y = 0;
+        rigidBody.velocity = desiredDirection;
+
+        yield return new WaitForSeconds(secondsOfParalyzation);
+        moveCor = StartCoroutine(MoveToDesiredPos()); // Start moving again!
+        isParalyzed = false;
+    }
+
+
+    private void OnDestroy()
+    {
+        Destroy(indicator);
     }
 }

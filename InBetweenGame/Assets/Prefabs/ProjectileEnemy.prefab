@@ -146,6 +146,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 316ac2a7d26c4f24482ccab8343d1e38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  boxCollider: {fileID: 3962266287077528344}
+  circleCollider: {fileID: 0}
+  spriteRenderer: {fileID: 3962266287077528347}
+  coinObject: {fileID: 761656200601707831, guid: a7fd4ed7b36d4da4abccdb4ea3299bc7, type: 3}
   maxHealth: 3
 --- !u!114 &6968985057196065365
 MonoBehaviour:
@@ -163,8 +167,10 @@ MonoBehaviour:
   projectileObject: {fileID: 536630327325091228, guid: 1641fa175f680e04c99759262027196e, type: 3}
   minDistance: 2
   maxDistance: 14
-  movementSpeed: 2.5
-  minProjectileSpeed: 3
-  maxProjectileSpeed: 7
+  movementSpeed: 3.5
+  minProjectileSpeed: 6
+  maxProjectileSpeed: 9
   minProjectileCooldown: 0.5
   maxProjectileCooldown: 4
+  shootingInaccuracy: 3
+  playerTransform: {fileID: 0}

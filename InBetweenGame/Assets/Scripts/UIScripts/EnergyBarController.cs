@@ -16,7 +16,7 @@ public class EnergyBarController : MonoBehaviour
 
     private void Update()
     {
-        SetEnergyRatio(playerCombatController.shootEnergy / playerCombatController.maxShootEnergy);
+        SetEnergyRatio(playerCombatController.gunEnergy / playerCombatController.maxGunEnergy);
     }
 
     /// <summary>

@@ -4,39 +4,54 @@ using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
 {
+    [Header("Components and Objects")]
     [SerializeField] private PlayerMovement playerMovementScript; // The player movement script attached to the player
     [SerializeField] private GameObject shootEffectObject; // The object which shows where the player shot
+    [SerializeField] private GameObject shieldObject; // The shield object that protects the player
 
     [Header("Shooting Attributes")]
     [SerializeField] private LayerMask shootLayerMask; // The Layer Mask for player shooting
     [SerializeField] private float shootDistance; // The distance the player can shoot
-    [SerializeField] public float maxShootEnergy = 10f; // The max energy the player's gun can have
+    [SerializeField] public float maxGunEnergy = 10f; // The max energy the player's gun can have
     [SerializeField] private float ShootEnergyPenalty = 2f; // The amount of energy the gun loses when shooting
-    [SerializeField] private float ShootenergyRechargeRate = 0.1f; // The rate of recharging for the gun's energy
+    [SerializeField] private float gunEnergyRechargeRate = 0.1f; // The rate of recharging for the gun's energy
     [SerializeField] private float shootingInaccuracy = 0.0f; // How inaccurate the player's shooting is
 
     [Header("Health")]
     [SerializeField] private int maxHealth = 1; // The player's possible max health
     [SerializeField] private HealthBarController healthBarController; // The script for the health bar
 
-    [HideInInspector] public float shootEnergy; // The energy the player's gun has
+    [Header("Shield Attributes")]
+    [SerializeField] private float coolDownSeconds; // How much time (in seconds) does the shield need to be used again
+    [SerializeField] private float shieldEnergyDepletionRate; // How much energy the shield uses while being active
+    [SerializeField] private float shieldProtectionEnergyPenalty; // How much energy the shield uses when pushing back enemies and destroying projectiles
+
+
+    private bool shieldCoolDownActive = false; // cooldown for the shield
+
+    [HideInInspector] public float gunEnergy; // The energy the player's gun has
 
     private int health; // The player's health
+
+    // Coroutines
+    private Coroutine shieldCooldownCoroutine;
 
     // Useful stuff
     private Vector2 groundVector; // Normalized vector representing the ground, which goes straight to the right
 
     private void Start()
     {
-        shootEnergy = maxShootEnergy;
+        gunEnergy = maxGunEnergy;
         groundVector = new Vector2(1, 0);
         health = maxHealth;
+        shieldObject.SetActive(false); // Shield is always inactive in the beginning
     }
 
     private void Update()
     {
         HandlePlayerAttack();
-        HandleShootEnergy();
+        HandleShield();
+        HandleGunEnergy(); // Handle the regeneration of the gun's energy if and only if no active abilities are turned on (for instance, using the shield)
     }
 
     /// <summary>
@@ -47,10 +62,10 @@ public class PlayerCombat : MonoBehaviour
         // When player presses left mouse button, instantiate projectile
         if (Input.GetMouseButtonDown(0))
         {
-            if (shootEnergy < ShootEnergyPenalty)
+            if (gunEnergy < ShootEnergyPenalty)
                 return; // You don't want to do anything if the player doesn't have enough energy to shoot
 
-            shootEnergy -= ShootEnergyPenalty; // When player shoots, always loses energy
+            gunEnergy -= ShootEnergyPenalty; // When player shoots, always loses energy
 
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 attackDirection = Quaternion.Euler(0f, 0f, Random.Range(-shootingInaccuracy, shootingInaccuracy)) * (mousePosition - transform.position);
@@ -89,14 +104,19 @@ public class PlayerCombat : MonoBehaviour
     }
 
     /// <summary>
-    /// This function keeps updating and increasing the gun's shooting energy and makes sure it never goes over maxEnergy and always increases at same speed
+    /// This function keeps updating and increasing the gun's energy and makes sure it never goes over maxEnergy and always increases at same speed
     /// </summary>
-    private void HandleShootEnergy()
+    private void HandleGunEnergy()
     {
-        if (shootEnergy == maxShootEnergy)
+        // While the shield is active, the gun can't recharge it's energy levels and loses energy
+        if (shieldObject.activeSelf)
+        {
+            gunEnergy = Mathf.Max(gunEnergy - (shieldEnergyDepletionRate * Time.deltaTime), 0f);
             return;
+        } 
+        if (gunEnergy == maxGunEnergy) { return; } // If the gun's energy is already at maximum, no need to deal with anything in this function
 
-        shootEnergy = Mathf.Min(shootEnergy + (ShootenergyRechargeRate * Time.deltaTime), maxShootEnergy);
+        gunEnergy = Mathf.Min(gunEnergy + (gunEnergyRechargeRate * Time.deltaTime), maxGunEnergy); // Increase the gun's energy and cap at max energy
     }
 
     /// <summary>
@@ -129,5 +149,64 @@ public class PlayerCombat : MonoBehaviour
         {
             TakeDamage(1);
         }
+    }
+
+
+    // TODO: ADD COOLDOWN FUNCTIONALITY FOR THE GUN
+
+    // ---------- SHIELD
+    private void HandleShield()
+    {
+        // The player can only use the shield if:
+        //     player is holding down the right mouse button
+        //     the shield is not cooling down after using it last time
+        //     the gun has energy left to spare on the shield
+        if (Input.GetMouseButtonDown(1) && !shieldCoolDownActive && gunEnergy > 0f)
+        {
+            // When the shield object becomes active again, teleport it to the mouse's position first
+            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            mousePosition.z = transform.position.z;
+            shieldObject.transform.position = mousePosition;
+
+            // Also rotate it correctly so it is looking at the player
+            Vector3 lookAtPlayerVector = transform.position - shieldObject.transform.position;
+            float angle = Mathf.Atan2(lookAtPlayerVector.y, lookAtPlayerVector.x) * Mathf.Rad2Deg + 90f;
+            shieldObject.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+            shieldObject.SetActive(true);
+        }
+        else if (Input.GetMouseButtonUp(1))
+        {
+            if (shieldObject.activeSelf == false) { return; } // If the shield was never activated, do nothing
+            shieldObject.SetActive(false);
+            if (shieldCooldownCoroutine != null) { return; } // If the coroutine is already running, we do nothing
+            shieldCooldownCoroutine = StartCoroutine(CoolDownShieldCor()); // Start shield cooldown!
+        }
+        else if (shieldObject.activeSelf && gunEnergy == 0) // Player is trying to use the shield but there is no energy left
+        {
+            shieldObject.SetActive(false); // Turn off the shield!
+            if (shieldCooldownCoroutine != null) { return; } // If the coroutine is already running, we do nothing
+            shieldCooldownCoroutine = StartCoroutine(CoolDownShieldCor()); // Start shield cooldown!
+        }
+    }
+
+    /// <summary>
+    /// This function is called when the shield protects player from enemy or projectile, thus suffering the protection penalty
+    /// </summary>
+    public void OnShieldProtect()
+    {
+        gunEnergy = Mathf.Max(gunEnergy - shieldProtectionEnergyPenalty, 0f);
+    }
+
+    /// <summary>
+    /// Controls the cool down of the shield, blocks the shield from being fired up again for a short while
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator CoolDownShieldCor()
+    {
+        shieldCoolDownActive = true;
+        yield return new WaitForSeconds(coolDownSeconds);
+        shieldCoolDownActive = false;
+        shieldCooldownCoroutine = null; // Just in case
     }
 }

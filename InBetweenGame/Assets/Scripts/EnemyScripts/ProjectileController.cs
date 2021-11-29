@@ -19,6 +19,11 @@ public class ProjectileController : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        else if (collision.CompareTag("Shield"))
+        {
+            collision.gameObject.GetComponent<ShieldController>().playerCombatScript.OnShieldProtect(); // The shield protected the player from me so it loses energy
+            Destroy(gameObject);
+        }
     }
 
     private void OnDestroy()
