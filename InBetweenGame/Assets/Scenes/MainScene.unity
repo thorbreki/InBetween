@@ -1508,7 +1508,7 @@ MonoBehaviour:
   maxXSpawn: 24
   beginningSpawningCooldown: 5
   spawningSpeedUp: 0.5
-  speedUpCoolDownSec: 15
+  speedUpCoolDownSec: 20
 --- !u!1 &1369621477
 GameObject:
   m_ObjectHideFlags: 0
@@ -1655,8 +1655,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerRigidBody: {fileID: 1443807946}
-  movementSpeed: 5
-  jumpForce: 300
+  movementSpeed: 6
+  jumpForce: 450
   maxStamina: 10
   staminaDepletionRate: 5
   staminaRechargeRate: 2
@@ -1703,7 +1703,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 1.5
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -1729,10 +1729,10 @@ MonoBehaviour:
     m_Bits: 3895
   shootDistance: 50
   maxGunEnergy: 10
-  ShootEnergyPenalty: 1
-  gunEnergyRechargeRate: 0.7
+  ShootEnergyPenalty: 0.3
+  gunEnergyRechargeRate: 0.9
   shootingInaccuracy: 3
-  maxHealth: 4
+  maxHealth: 8
   healthBarController: {fileID: 257941218}
   coolDownSeconds: 2
   shieldEnergyDepletionRate: 0.3
@@ -1749,7 +1749,7 @@ GameObject:
   - component: {fileID: 1648392543}
   - component: {fileID: 1648392542}
   - component: {fileID: 1648392544}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Ground
   m_TagString: Ground
   m_Icon: {fileID: 0}

@@ -139,7 +139,7 @@ public class PlayerCombat : MonoBehaviour
     {
         if (collision.transform.CompareTag("Enemy"))
         {
-            TakeDamage(1);
+            TakeDamage(2);
         }
     }
 

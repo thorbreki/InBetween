@@ -155,9 +155,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 0}
   rigidBody: {fileID: 231209237740860297}
-  minMovementForce: 8
-  maxMovementForce: 12
+  minMovementForce: 10
+  maxMovementForce: 14
   minMovementSpeed: 8
   maxMovementSpeed: 14
-  minMovementCooldown: 1
-  maxMovementCooldown: 4
+  minMovementCooldown: 0.5
+  maxMovementCooldown: 2
