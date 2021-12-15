@@ -21,6 +21,9 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private int maxHealth = 1; // The player's possible max health
     [SerializeField] private HealthBarController healthBarController; // The script for the health bar
 
+    [Header("Teleport Attributes")]
+    [SerializeField] private float teleportEnergyPenalty; // How much energy the Player uses when teleporting
+
     [Header("Shield Attributes")]
     [SerializeField] private float coolDownSeconds; // How much time (in seconds) does the shield need to be used again
     [SerializeField] private float shieldEnergyDepletionRate; // How much energy the shield uses while being active
@@ -42,9 +45,11 @@ public class PlayerCombat : MonoBehaviour
     private void Start()
     {
         gunEnergy = maxGunEnergy;
-        groundVector = new Vector2(1, 0);
         health = maxHealth;
         shieldObject.SetActive(false); // Shield is always inactive in the beginning
+
+        // Initialize vectors
+        groundVector = new Vector2(1, 0);
     }
 
     private void Update()
@@ -123,7 +128,7 @@ public class PlayerCombat : MonoBehaviour
     /// This function runs when an enemy hurts a player
     /// </summary>
     /// <param name="damage">The damage the player will endure</param>
-    private void TakeDamage(int damage)
+    public void TakeDamage(int damage)
     {
         health = Mathf.Max(health - damage, 0);
         healthBarController.SetHealthBarRatio((float)health / (float)maxHealth);
@@ -135,13 +140,13 @@ public class PlayerCombat : MonoBehaviour
     }
 
 
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.transform.CompareTag("Enemy"))
-        {
-            TakeDamage(2);
-        }
-    }
+    //private void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    if (collision.transform.CompareTag("Enemy"))
+    //    {
+    //        TakeDamage(2);
+    //    }
+    //}
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -155,6 +160,7 @@ public class PlayerCombat : MonoBehaviour
     // TODO: ADD COOLDOWN FUNCTIONALITY FOR THE GUN
 
     // ---------- SHIELD
+
     private void HandleShield()
     {
         // The player can only use the shield if:
@@ -167,11 +173,6 @@ public class PlayerCombat : MonoBehaviour
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mousePosition.z = transform.position.z;
             shieldObject.transform.position = mousePosition;
-
-            // Also rotate it correctly so it is looking at the player
-            Vector3 lookAtPlayerVector = transform.position - shieldObject.transform.position;
-            float angle = Mathf.Atan2(lookAtPlayerVector.y, lookAtPlayerVector.x) * Mathf.Rad2Deg + 90f;
-            shieldObject.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
 
             shieldObject.SetActive(true);
         }

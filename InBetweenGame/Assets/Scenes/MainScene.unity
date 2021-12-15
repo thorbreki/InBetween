@@ -685,9 +685,9 @@ GameObject:
   m_Component:
   - component: {fileID: 757662793}
   - component: {fileID: 757662792}
-  - component: {fileID: 757662794}
   - component: {fileID: 757662796}
   - component: {fileID: 757662795}
+  - component: {fileID: 757662794}
   m_Layer: 6
   m_Name: Shield
   m_TagString: Shield
@@ -736,7 +736,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 6f215c744b067094dbaea1c074e0e74d, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3bfb5ad1d014a084097c21915e0b8276, type: 3}
   m_Color: {r: 0, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -756,13 +756,13 @@ Transform:
   m_GameObject: {fileID: 757662791}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -5, y: 5, z: 0}
-  m_LocalScale: {x: 2, y: 0.5, z: 1}
+  m_LocalScale: {x: 4, y: 4, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &757662794
-BoxCollider2D:
+--- !u!58 &757662794
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -771,22 +771,12 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_Radius: 0.5
 --- !u!114 &757662795
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -802,11 +792,10 @@ MonoBehaviour:
   playerTransform: {fileID: 1443807943}
   playerCombatScript: {fileID: 1443807947}
   rigidBody: {fileID: 757662796}
-  width: 2
-  height: 0.5
-  movementSpeed: 6
+  diameter: 4
+  movementSpeed: 10
   enemyKnockbackForce: 4
-  enemyParalyzationSeconds: 2
+  enemyParalyzationSeconds: 4
 --- !u!50 &757662796
 Rigidbody2D:
   serializedVersion: 4
@@ -1453,7 +1442,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1321687310
 GameObject:
@@ -1499,6 +1488,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 1443807943}
+  playerCombatScript: {fileID: 1443807947}
   basicEnemyObject: {fileID: 5040533283122625086, guid: 16ab70249ef7a1649a3d97463876d1c0, type: 3}
   projectileEnemyObject: {fileID: 3962266287077528342, guid: 66410cf31473a0945a781ae8421a607a, type: 3}
   stomperEnemyObject: {fileID: 8983535167100375055, guid: acd558305bbe487428c042d894470c3c, type: 3}
@@ -1640,7 +1630,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1443807944
 MonoBehaviour:
@@ -1656,7 +1646,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerRigidBody: {fileID: 1443807946}
   movementSpeed: 6
-  jumpForce: 450
+  jumpForce: 400
+  jumpStaminaPenalty: 1
   maxStamina: 10
   staminaDepletionRate: 5
   staminaRechargeRate: 2
@@ -1734,7 +1725,8 @@ MonoBehaviour:
   shootingInaccuracy: 3
   maxHealth: 8
   healthBarController: {fileID: 257941218}
-  coolDownSeconds: 2
+  teleportEnergyPenalty: 1
+  coolDownSeconds: 0
   shieldEnergyDepletionRate: 0.3
   shieldProtectionEnergyPenalty: 0.3
   gunEnergy: 0
@@ -1817,10 +1809,10 @@ Transform:
   m_GameObject: {fileID: 1648392541}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -2.5, z: -1}
-  m_LocalScale: {x: 50, y: 5, z: 1}
+  m_LocalScale: {x: 55, y: 5, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1648392544
 BoxCollider2D:
@@ -1846,7 +1838,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1.5, y: 1}
+  m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
 --- !u!1 &1769755816
 GameObject:
@@ -2378,6 +2370,71 @@ MonoBehaviour:
   cameraComponent: {fileID: 2051196465}
   yOffset: 4
   zoomSpeed: 20
+--- !u!1001 &2077666628
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 8983535167100375054, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375054, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -16.937027
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375054, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 9.464493
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375054, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375054, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375054, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375054, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375054, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375054, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375054, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375054, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375055, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: m_Name
+      value: StomperEnemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 8983535167100375061, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: playerTransform
+      value: 
+      objectReference: {fileID: 1443807943}
+    - target: {fileID: 8983535167100375061, guid: acd558305bbe487428c042d894470c3c, type: 3}
+      propertyPath: playerCombatScript
+      value: 
+      objectReference: {fileID: 1443807947}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: acd558305bbe487428c042d894470c3c, type: 3}
 --- !u!1 &2128118081
 GameObject:
   m_ObjectHideFlags: 0

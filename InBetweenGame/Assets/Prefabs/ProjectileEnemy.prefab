@@ -165,6 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigidBody: {fileID: 3962266287077528345}
   projectileObject: {fileID: 536630327325091228, guid: 1641fa175f680e04c99759262027196e, type: 3}
+  spriteRenderer: {fileID: 3962266287077528347}
   minDistance: 2
   maxDistance: 14
   movementSpeed: 3.5
@@ -173,4 +174,6 @@ MonoBehaviour:
   minProjectileCooldown: 0.5
   maxProjectileCooldown: 4
   shootingInaccuracy: 3
+  normalColor: {r: 1, g: 0.3647059, b: 0.3647059, a: 1}
+  paralyzedColor: {r: 0.5943396, g: 0.3504361, b: 0.3504361, a: 1}
   playerTransform: {fileID: 0}

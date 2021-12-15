@@ -22,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Jumping attributes")]
     [SerializeField] private float jumpForce = 300f;
+    [SerializeField] private float jumpStaminaPenalty;
 
     [Header("Running attributes")]
     public float maxStamina; // The max amount of stamina the player can have
@@ -103,13 +104,11 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     private void HandleJumping()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && stamina >= jumpStaminaPenalty)
         {
-            if (!isJumping)
-            {
-                isJumping = true;
-                alreadyJumped = false;
-            }
+            isJumping = true;
+            alreadyJumped = false;
+            stamina -= jumpStaminaPenalty;
         }
     }
 

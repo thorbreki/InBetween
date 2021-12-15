@@ -9,6 +9,8 @@ public class StomperController : MonoBehaviour
     [Header("Components and Objects")]
     [SerializeField] private Rigidbody2D rigidBody;
     [SerializeField] private GameObject indicatorObject;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+                     public PlayerCombat playerCombatScript;
 
     [Header("Movement Attributes")]
     [SerializeField] private float minMovementSpeed;
@@ -17,6 +19,10 @@ public class StomperController : MonoBehaviour
     [Header("Attack Attributes")]
     [SerializeField] private float minAttackForce; // The minimum speed the enemy goes down to kill
     [SerializeField] private float maxAttackForce; // The maximum speed the enemy goes down to kill
+
+    [Header("Paralyzed Attributes")]
+    [SerializeField] private Color normalColor;
+    [SerializeField] private Color paralyzedColor;
 
     private GameObject indicator; // The transform component of the indicator object
 
@@ -97,41 +103,46 @@ public class StomperController : MonoBehaviour
     /// Basic Enemy gets knocked back and paralyzed when hit with the shield
     /// </summary>
     /// <param name="collision"></param>
-    private void OnShieldCollision(Collision2D collision)
+    private void OnShieldCollision(Collider2D collider)
     {
-        if (shieldControllerScript == null) { shieldControllerScript = collision.gameObject.GetComponent<ShieldController>(); } // Get the shield controller script if not already
+        if (shieldControllerScript == null) { shieldControllerScript = collider.gameObject.GetComponent<ShieldController>(); } // Get the shield controller script if not already
 
         if (paralyzeCoroutine != null) { StopCoroutine(paralyzeCoroutine); } // Stop previous paralyzation if it is currently active
         paralyzeCoroutine = StartCoroutine(ParalyzeCor(shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
-
-        knockBackVector = transform.position - collision.transform.position; // Now it is known what direction this enemy must go in
-        rigidBody.AddForce(knockBackVector.normalized * shieldControllerScript.enemyKnockbackForce, ForceMode2D.Impulse);
 
         // Call the playercombat script through the shield object to make the player lose the correct amount of energy
         shieldControllerScript.playerCombatScript.OnShieldProtect();
     }
 
 
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (collider.CompareTag("Shield"))
+        {
+            OnShieldCollision(collider);
+        }
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.transform.CompareTag("Shield"))
+        if (!isParalyzed && collision.transform.CompareTag("Player"))
         {
-            OnShieldCollision(collision);
+            playerCombatScript.TakeDamage(2);
         }
     }
 
     private IEnumerator ParalyzeCor(float secondsOfParalyzation)
     {
         isParalyzed = true;
+        spriteRenderer.color = paralyzedColor;
 
         // Make sure all movement and attacks are completely stopped
         if (moveCor != null) { StopCoroutine(moveCor); }
         if (attackPlayerCor != null) { StopCoroutine(attackPlayerCor); }
-        desiredDirection.x = 0; desiredDirection.y = 0;
-        rigidBody.velocity = desiredDirection;
 
         yield return new WaitForSeconds(secondsOfParalyzation);
         moveCor = StartCoroutine(MoveToDesiredPos()); // Start moving again!
+        spriteRenderer.color = normalColor;
         isParalyzed = false;
     }
 

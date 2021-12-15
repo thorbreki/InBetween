@@ -126,7 +126,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
+  m_LinearDrag: 0.5
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
@@ -166,7 +166,10 @@ MonoBehaviour:
   playerTransform: {fileID: 0}
   rigidBody: {fileID: 8983535167100375048}
   indicatorObject: {fileID: 4095854476437721166, guid: 67b6a6e9ca174e14ea2f40fa4ebfb426, type: 3}
+  spriteRenderer: {fileID: 8983535167100375049}
   minMovementSpeed: 3
   maxMovementSpeed: 5
-  minAttackForce: 40
-  maxAttackForce: 55
+  minAttackForce: 55
+  maxAttackForce: 70
+  normalColor: {r: 0, g: 1, b: 0.15686275, a: 1}
+  paralyzedColor: {r: 0.35978106, g: 0.7264151, b: 0.41729227, a: 1}

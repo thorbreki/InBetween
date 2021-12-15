@@ -7,6 +7,7 @@ public class ProjectileEnemyController : MonoBehaviour
     [Header("Components and Objects")]
     [SerializeField] private Rigidbody2D rigidBody; // The rigidbody component of the enemy
     [SerializeField] private GameObject projectileObject; // The projectile game object
+    [SerializeField] private SpriteRenderer spriteRenderer; // The sprite renderer component
 
     [Header("Movement Attributes")]
     [SerializeField] private float minDistance; // The lower bound of the random distance the enemy wants to keep from the player
@@ -19,6 +20,10 @@ public class ProjectileEnemyController : MonoBehaviour
     [SerializeField] private float minProjectileCooldown; // the min possible time between shooting (in seconds)
     [SerializeField] private float maxProjectileCooldown; // the max possible time between shooting (in seconds)
     [SerializeField] private float shootingInaccuracy; // How inaccurate the player's shooting is
+
+    [Header("Paralyzed Attributes")]
+    [SerializeField] private Color normalColor;
+    [SerializeField] private Color paralyzedColor;
 
     private float projectileSpeed; // The speed of the projectiles this enemy shoots
     private float projectileCooldown; // The seconds between the enemy can shoot projectiles
@@ -125,16 +130,12 @@ public class ProjectileEnemyController : MonoBehaviour
     /// Basic Enemy gets knocked back and paralyzed when hit with the shield
     /// </summary>
     /// <param name="collision"></param>
-    private void OnShieldCollision(Collision2D collision)
+    private void OnShieldCollision(Collider2D collider)
     {
-        if (shieldControllerScript == null) { shieldControllerScript = collision.gameObject.GetComponent<ShieldController>(); } // Get the shield controller script if not already
+        if (shieldControllerScript == null) { shieldControllerScript = collider.gameObject.GetComponent<ShieldController>(); } // Get the shield controller script if not already
 
         if (paralyzeCoroutine != null) { StopCoroutine(paralyzeCoroutine); } // Stop previous paralyzation if it is currently active
         paralyzeCoroutine = StartCoroutine(ParalyzeCor(shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
-
-        // Being knocked back
-        knockBackVector = transform.position - collision.transform.position; // Now it is known what direction this enemy must go in
-        rigidBody.AddForce(knockBackVector.normalized * shieldControllerScript.enemyKnockbackForce, ForceMode2D.Impulse);
 
         // Call the playercombat script through the shield object to make the player lose the correct amount of energy
         shieldControllerScript.playerCombatScript.OnShieldProtect();
@@ -142,24 +143,20 @@ public class ProjectileEnemyController : MonoBehaviour
     private IEnumerator ParalyzeCor(float secondsOfParalyzation)
     {
         isParalyzed = true;
-
-        // Make sure all movement is completely stopped
-        toPlayerVector.x = 0; toPlayerVector.y = 0; toPlayerVector.z = 0;
-        rigidBody.velocity = toPlayerVector;
-
         // Make sure all shooting is stopped
         if (shootPlayerCoroutine != null) { StopCoroutine(shootPlayerCoroutine); } // Stop the shooting coroutine
-
+        spriteRenderer.color = paralyzedColor;
         yield return new WaitForSeconds(secondsOfParalyzation);
         isParalyzed = false; // No longer paralyzed
+        spriteRenderer.color = normalColor;
         shootPlayerCoroutine = StartCoroutine(ShootPlayerCor()); // Start shooting again
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collision.transform.CompareTag("Shield"))
+        if (collider.CompareTag("Shield"))
         {
-            OnShieldCollision(collision);
+            OnShieldCollision(collider);
         }
     }
 

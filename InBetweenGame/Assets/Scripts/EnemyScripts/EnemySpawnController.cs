@@ -5,6 +5,7 @@ using UnityEngine;
 public class EnemySpawnController : MonoBehaviour
 {
     [SerializeField] private Transform playerTransform;
+    [SerializeField] private PlayerCombat playerCombatScript;
 
     [Header("Enemy objects")]
     [SerializeField] private GameObject basicEnemyObject;
@@ -30,14 +31,26 @@ public class EnemySpawnController : MonoBehaviour
 
     private float spawnCooldown;
     private Vector3 spawnPosition;
+    
+    private Coroutine spawnEnemiesCoroutine;
 
 
     private void Start()
     {
         spawnPosition = new Vector3(0, spawnYLevel, transform.position.z);
         spawnCooldown = beginningSpawningCooldown;
-        StartCoroutine(spawnEnemies()); // Start spawning enemies!
-        StartCoroutine(IncreaseSpawningCooldown()); // Start speeding up!
+        //StartCoroutine(spawnEnemies()); // Start spawning enemies!
+        //StartCoroutine(IncreaseSpawningCooldown()); // Start speeding up!
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.RightShift))
+        {
+            if (spawnEnemiesCoroutine != null) { return; }
+            spawnEnemiesCoroutine = StartCoroutine(spawnEnemies());
+            StartCoroutine(IncreaseSpawningCooldown()); // Start speeding up!
+        }
     }
 
     // A coroutine that spawns enemies
@@ -61,6 +74,7 @@ public class EnemySpawnController : MonoBehaviour
                 case 3:
                     newEnemy = SpawnEnemy(stomperEnemyObject);
                     newEnemy.GetComponent<StomperController>().playerTransform = playerTransform;
+                    newEnemy.GetComponent<StomperController>().playerCombatScript = playerCombatScript;
                     break;
                 default: // When the value is 4
                     newEnemy = SpawnEnemy(rollerEnemyObject);

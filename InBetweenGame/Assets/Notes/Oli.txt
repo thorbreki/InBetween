@@ -1,0 +1,16 @@
+- Finnst skjöldurinn vera of hægur
+- Finnst the feel af leiknum vera pretty nice
+- EIGIÐ NOTE: Rollers fara frekar hægt :(
+- Þegar maður er kominn í svona Oh Boi stöðu þá er maður mjög snöggur að deyja
+- Mjög langur tími þar sem maður er með allt í lagi og síðan allt í einu fer allt í fokk (Ekki super satisfying)
+- Difficulty does not increase linearly with the number of enemies
+- Finnst ekki vera super mikilvægt að þurfa að sprinta
+- Yrði nice að hafa einhvers konar sprengingu (AoE damage)
+- Láta skjöldinn ekki hafa cooldown, vera samt mun meira power hungry (meikar meira sens þannig)
+- Láta the enemies sjást betur þegar þú hittir í þá
+- Gæti orðið mjög skemmtilegur leikur!
+- SELF NOTE: Kannski að sprinting væri meira dodge mechanic (ekkert verið að hlaupa allavegana í the tests)
+- Skjöldurinn ætti að vera hringur sem ýtir marga gæa frá sér
+- Shield levitation mechanic very interesting
+- Flying, baby (með dash eða actual flying mechanic??)
+- Teleporting? (Svipað og dash, en samt allar áttir og farið lengra)

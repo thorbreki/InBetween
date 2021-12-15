@@ -8,6 +8,9 @@ public class BasicEnemyController : MonoBehaviour
     [SerializeField] private float minMovementSpeed; // The minimum possible movement speed this enemy could have
     [SerializeField] private float maxMovementSpeed; // The maximum possible movement speed this enemy could have
     [SerializeField] private Rigidbody2D rb;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Color normalColor;
+    [SerializeField] private Color paralyzedColor;
 
     private float movementSpeed;
 
@@ -53,29 +56,31 @@ public class BasicEnemyController : MonoBehaviour
     /// Basic Enemy gets knocked back and paralyzed when hit with the shield
     /// </summary>
     /// <param name="collision"></param>
-    private void OnShieldCollision(Collision2D collision)
+    private void OnShieldCollision(Collider2D collider)
     {
-        if (shieldControllerScript == null) { shieldControllerScript = collision.gameObject.GetComponent<ShieldController>(); } // Get the shield controller script if not already
+        if (shieldControllerScript == null) { shieldControllerScript = collider.gameObject.GetComponent<ShieldController>(); } // Get the shield controller script if not already
 
         if (paralyzeCoroutine != null) { StopCoroutine(paralyzeCoroutine); } // Stop previous paralyzation if it is currently active
         paralyzeCoroutine = StartCoroutine(ParalyzeCor(shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
-
-        knockBackVector = transform.position - collision.transform.position; // Now it is known what direction this enemy must go in
-        rb.AddForce(knockBackVector.normalized * shieldControllerScript.enemyKnockbackForce, ForceMode2D.Impulse);
 
         // Call the playercombat script through the shield object to make the player lose the correct amount of energy
         shieldControllerScript.playerCombatScript.OnShieldProtect();
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collision.transform.CompareTag("Shield"))
+        if (collider.CompareTag("Shield"))
         {
-            OnShieldCollision(collision);
+            OnShieldCollision(collider);
             return;
         }
-        else if (collision.transform.CompareTag("Player"))
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.transform.CompareTag("Player") && !isParalyzed)
         {
+            collision.gameObject.GetComponent<PlayerCombat>().TakeDamage(2);
             Destroy(gameObject);
         }
     }
@@ -88,12 +93,11 @@ public class BasicEnemyController : MonoBehaviour
     private IEnumerator ParalyzeCor(float secondsOfParalyzation)
     {
         isParalyzed = true;
-
-        // Make sure all movement is completely stopped
-        toPlayerVector.x = 0; toPlayerVector.y = 0; toPlayerVector.z = 0; 
-        rb.velocity = toPlayerVector;
-
+        rb.gravityScale = 1f;
+        spriteRenderer.color = paralyzedColor;
         yield return new WaitForSeconds(secondsOfParalyzation);
+        rb.gravityScale = 0f;
+        spriteRenderer.color = normalColor;
         isParalyzed = false;
     }
 

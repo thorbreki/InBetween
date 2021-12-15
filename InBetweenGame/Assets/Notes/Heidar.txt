@@ -1,0 +1,15 @@
+HEIÐAR:
+
+- Playerinn dettur ekki niður þegar hann er að stanslaust að hreyfa sig að veggnum
+- Það ætti að vera hægt að hoppa með w
+- Fljótt fannst fyrstu 15 stigin easy
+- Getur bara miðað nálægt kallinum en getur upgrade-að að hægt sé að miða lengra frá sér
+- MITT NOTE: Playerinn ætti kannski ekki að hafa endalaust range (geta upgrade-a það)
+- Bæta við enn fleiri enemy types (Mjög mörgum), þá mun the endgame vera klikkað
+- Líkar við að beama gæa frá langt í burtu
+- Scaling er aðeins of hægt, of auðvelt í of langan tíma
+- Það ætti að vera til eitthvað upgrade sem er hræðilegt fyrst en getur verið mjög powerful, ætti að vera partur af stamina
+  þar sem maður gerir ekki mikið með því núna allavegana. (Einhvers konar Invisibility frame move)
+- Soldið unfair að enemies geta spawnað hvar sem er, til dæmis stomper spawnaði fyrir ofan Heiðar
+- Basic Enemy og Projectile Enemy collideast ekki við jörðina.
+- Cool að hafa melee option (getur haft bæði sverð og skjöld en þá þarftu að sleppa skyldinum)
