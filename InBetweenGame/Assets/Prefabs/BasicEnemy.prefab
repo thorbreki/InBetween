@@ -48,8 +48,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 0}
+  healthScript: {fileID: 6697271736491761183}
   minMovementSpeed: 3
   maxMovementSpeed: 6
+  velocityChangeSpeed: 0.5
   rb: {fileID: 7249771453206446033}
   spriteRenderer: {fileID: 4823088999894854534}
   normalColor: {r: 0.7372549, g: 0, b: 1, a: 1}

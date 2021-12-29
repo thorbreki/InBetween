@@ -39,7 +39,7 @@ public class EnemySpawnController : MonoBehaviour
     {
         spawnPosition = new Vector3(0, spawnYLevel, transform.position.z);
         spawnCooldown = beginningSpawningCooldown;
-        //StartCoroutine(spawnEnemies()); // Start spawning enemies!
+        StartCoroutine(spawnEnemies()); // Start spawning enemies!
         //StartCoroutine(IncreaseSpawningCooldown()); // Start speeding up!
     }
 
@@ -58,14 +58,13 @@ public class EnemySpawnController : MonoBehaviour
     {
         while (!Input.GetKey(KeyCode.Escape))
         {
-            int randomEnemyNumber = Random.Range(1, 5); // The number which will decide which enemy type gets spawned
+            int randomEnemyNumber = Random.Range(2, 3); // The number which will decide which enemy type gets spawned
             GameObject newEnemy;
 
             switch (randomEnemyNumber)
             {
                 case 1:
                     newEnemy = SpawnEnemy(basicEnemyObject);
-                    newEnemy.GetComponent<BasicEnemyController>().playerTransform = playerTransform;
                     break;
                 case 2:
                     newEnemy = SpawnEnemy(projectileEnemyObject);
@@ -73,12 +72,15 @@ public class EnemySpawnController : MonoBehaviour
                     break;
                 case 3:
                     newEnemy = SpawnEnemy(stomperEnemyObject);
-                    newEnemy.GetComponent<StomperController>().playerTransform = playerTransform;
-                    newEnemy.GetComponent<StomperController>().playerCombatScript = playerCombatScript;
+                    StomperController stomperScript = newEnemy.GetComponent<StomperController>();
+                    stomperScript.playerTransform = playerTransform;
+                    stomperScript.playerCombatScript = playerCombatScript;
                     break;
                 default: // When the value is 4
                     newEnemy = SpawnEnemy(rollerEnemyObject);
-                    newEnemy.GetComponent<RollerEnemyController>().playerTransform = playerTransform;
+                    RollerEnemyController rollerScript = newEnemy.GetComponent<RollerEnemyController>();
+                    rollerScript.playerTransform = playerTransform;
+                    rollerScript.playerCombatScript = playerCombatScript;
                     break;
             }
             yield return new WaitForSeconds(spawnCooldown);

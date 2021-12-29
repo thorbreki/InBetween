@@ -163,12 +163,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86469beea0bc63f42bd74d35ccf721c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  healthScript: {fileID: 3962266287077528349}
   rigidBody: {fileID: 3962266287077528345}
   projectileObject: {fileID: 536630327325091228, guid: 1641fa175f680e04c99759262027196e, type: 3}
   spriteRenderer: {fileID: 3962266287077528347}
   minDistance: 2
   maxDistance: 14
   movementSpeed: 3.5
+  velocityChangeSpeed: 0.5
   minProjectileSpeed: 6
   maxProjectileSpeed: 9
   minProjectileCooldown: 0.5

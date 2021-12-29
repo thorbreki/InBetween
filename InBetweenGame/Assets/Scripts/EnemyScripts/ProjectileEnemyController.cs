@@ -5,6 +5,7 @@ using UnityEngine;
 public class ProjectileEnemyController : MonoBehaviour
 {
     [Header("Components and Objects")]
+    [SerializeField] private EnemyHealthController healthScript;
     [SerializeField] private Rigidbody2D rigidBody; // The rigidbody component of the enemy
     [SerializeField] private GameObject projectileObject; // The projectile game object
     [SerializeField] private SpriteRenderer spriteRenderer; // The sprite renderer component
@@ -13,6 +14,7 @@ public class ProjectileEnemyController : MonoBehaviour
     [SerializeField] private float minDistance; // The lower bound of the random distance the enemy wants to keep from the player
     [SerializeField] private float maxDistance; // The higher bound (EXCLUSIVE IN THE RANDOM FUNCTION)
     [SerializeField] private float movementSpeed; // The enemy's movementSpeed
+    [SerializeField] private float velocityChangeSpeed; // How fast the enemy can change its course
 
     [Header("Attack Attributes")]
     [SerializeField] private float minProjectileSpeed; // the min possible speed of the projectiles
@@ -38,9 +40,11 @@ public class ProjectileEnemyController : MonoBehaviour
     private bool isParalyzed = false;
     private Coroutine paralyzeCoroutine; // Coroutine object for when the enemy gets paralyzed by the shield
     private Vector2 knockBackVector; // The vector that knocks the enemy back
+    private Vector2 currVelocity; // The vector to store the current movement velocity the Enemy has
 
-    private Vector3 toPlayerVector; // The vector which defines where the enemy
+    private Vector2 toPlayerVector; // The vector which defines where the enemy
 
+    private Coroutine movementCoroutine; // Coroutine object for movement of Projectile Enemy
     private Coroutine shootPlayerCoroutine; // Coroutine object for shooting the player
 
 
@@ -55,25 +59,13 @@ public class ProjectileEnemyController : MonoBehaviour
         targetSideOfPlayer = Random.Range(0, 2);
 
         // Initialize the vectors so they can be used
-        toPlayerVector = Vector3.zero;
+        toPlayerVector = Vector2.zero;
+        currVelocity = Vector2.zero;
         knockBackVector = Vector2.zero;
 
+        // Start functionality coroutines
+        movementCoroutine = StartCoroutine(MoveTowardsPlayer());
         shootPlayerCoroutine = StartCoroutine(ShootPlayerCor());
-    }
-
-    private void Update()
-    {
-        if (playerTransform == null || isParalyzed)
-        {
-            return;
-        }
-
-        SetUpMovement();
-    }
-
-    private void FixedUpdate()
-    {
-        MoveToProximityOfPlayer();
     }
 
     /// <summary>
@@ -86,26 +78,59 @@ public class ProjectileEnemyController : MonoBehaviour
     }
 
     /// <summary>
-    /// Sets all the movement variables to correct values before the actual move call in FixedUpdate
+    /// Always, constantly try to move towards the player to get close enough to hurt him
     /// </summary>
-    private void SetUpMovement()
+    private IEnumerator MoveTowardsPlayer()
+    {
+        float squaredMovementSpeed = Mathf.Pow(movementSpeed, 2);
+        float movementSpeedHalfed = movementSpeed / 2;
+        while (true)
+        {
+            // Initialize movement vectors
+            toPlayerVector = playerTransform.position - transform.position;
+            SetUpPlayerVector();
+            currVelocity.x = rigidBody.velocity.x; currVelocity.y = rigidBody.velocity.y;
+
+            // 0th case: Enemy has managed to get to target place
+            if (toPlayerVector.x == 0 && toPlayerVector.y == 0) { currVelocity.x = 0; currVelocity.y = 0; }
+
+            // 1st case: Enemy is moving too slow
+            else if ((currVelocity.sqrMagnitude - squaredMovementSpeed) < -0.05f)
+            {
+                currVelocity += toPlayerVector.normalized * velocityChangeSpeed;
+            }
+            // 3rd case: Enemy is moving too fast
+            else if ((currVelocity.sqrMagnitude - squaredMovementSpeed) > 0.05f)
+            {
+                currVelocity -= currVelocity.normalized * velocityChangeSpeed;
+            }
+            // 2nd case: Enemy is moving at perfect speed
+            else
+            {
+                currVelocity += (-currVelocity.normalized * movementSpeedHalfed) + (toPlayerVector.normalized * movementSpeedHalfed);
+            }
+
+            // Finally, set the velocity of the enemy
+            rigidBody.velocity = currVelocity;
+            yield return null;
+        }
+    }
+
+    /// <summary>
+    /// Sets all the movement variables to correct values before the actual move call in the movement coroutine
+    /// </summary>
+    private void SetUpPlayerVector()
     {
         // The target x position will now be randomly right or left side of the player always
         float targetXPosition = targetSideOfPlayer == 1 ? playerTransform.position.x + targetXDistanceFromPlayer : playerTransform.position.x - targetXDistanceFromPlayer;
         toPlayerVector.x = targetXPosition - transform.position.x;
         toPlayerVector.y = targetDistanceFromGround - transform.position.y;
 
-        if (toPlayerVector.sqrMagnitude <= 0.005f)
+        if (toPlayerVector.sqrMagnitude <= 0.05f)
         {
             toPlayerVector.x = 0;
             toPlayerVector.y = 0;
         }
-    }
-
-    private void MoveToProximityOfPlayer()
-    {
-        if (isParalyzed) { return; }
-        rigidBody.velocity = toPlayerVector.normalized * movementSpeed;
     }
 
     private IEnumerator ShootPlayerCor()
@@ -145,10 +170,12 @@ public class ProjectileEnemyController : MonoBehaviour
         isParalyzed = true;
         // Make sure all shooting is stopped
         if (shootPlayerCoroutine != null) { StopCoroutine(shootPlayerCoroutine); } // Stop the shooting coroutine
+        if (movementCoroutine != null) { StopCoroutine(movementCoroutine); } // Stop all movement!
         spriteRenderer.color = paralyzedColor;
         yield return new WaitForSeconds(secondsOfParalyzation);
         isParalyzed = false; // No longer paralyzed
         spriteRenderer.color = normalColor;
+        movementCoroutine = StartCoroutine(MoveTowardsPlayer()); // Movement again!
         shootPlayerCoroutine = StartCoroutine(ShootPlayerCor()); // Start shooting again
     }
 
@@ -157,6 +184,33 @@ public class ProjectileEnemyController : MonoBehaviour
         if (collider.CompareTag("Shield"))
         {
             OnShieldCollision(collider);
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.transform.CompareTag("Player"))
+        {
+            if (GameManager.instance.playerMovementScript.isRunning)
+            {
+                knockBackVector = transform.position - playerTransform.position;
+                healthScript.TakeDamage(1);
+                if (!isParalyzed)
+                {
+                    print("Pushing enemy back!");
+                    rigidBody.AddForce(knockBackVector.normalized * GameManager.instance.staminaShieldControllerScript.knockbackForce, ForceMode2D.Impulse);
+                }
+                if (isParalyzed)
+                {
+                    rigidBody.AddForce(knockBackVector.normalized * GameManager.instance.staminaShieldControllerScript.knockbackForce, ForceMode2D.Impulse);
+                }
+                GameManager.instance.playerMovementScript.OnStaminaShieldProtect();
+            }
+            else // Player does not have stamina shield active so hurt him!
+            {
+                GameManager.instance.playerCombatScript.TakeDamage(2);
+                Destroy(gameObject);
+            }
         }
     }
 

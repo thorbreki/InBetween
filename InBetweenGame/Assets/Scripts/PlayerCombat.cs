@@ -24,7 +24,7 @@ public class PlayerCombat : MonoBehaviour
     [Header("Teleport Attributes")]
     [SerializeField] private float teleportEnergyPenalty; // How much energy the Player uses when teleporting
 
-    [Header("Shield Attributes")]
+    [Header("Shields Attributes")]
     [SerializeField] private float coolDownSeconds; // How much time (in seconds) does the shield need to be used again
     [SerializeField] private float shieldEnergyDepletionRate; // How much energy the shield uses while being active
     [SerializeField] private float shieldProtectionEnergyPenalty; // How much energy the shield uses when pushing back enemies and destroying projectiles
@@ -138,15 +138,6 @@ public class PlayerCombat : MonoBehaviour
             GameManager.instance.PlayerDied();
         }
     }
-
-
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    if (collision.transform.CompareTag("Enemy"))
-    //    {
-    //        TakeDamage(2);
-    //    }
-    //}
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

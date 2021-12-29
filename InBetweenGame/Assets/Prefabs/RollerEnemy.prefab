@@ -155,9 +155,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 0}
   rigidBody: {fileID: 231209237740860297}
+  spriteRenderer: {fileID: 580315104921005759}
+  playerCombatScript: {fileID: 0}
   minMovementForce: 10
   maxMovementForce: 14
   minMovementSpeed: 8
   maxMovementSpeed: 14
   minMovementCooldown: 0.5
   maxMovementCooldown: 2
+  normalColor: {r: 1, g: 0.5254902, b: 0, a: 1}
+  paralyzedColor: {r: 0.8490566, g: 0.6799207, b: 0.49261305, a: 1}

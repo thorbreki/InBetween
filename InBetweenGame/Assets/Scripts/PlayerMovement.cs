@@ -10,12 +10,16 @@ public class PlayerMovement : MonoBehaviour
     private bool isJumping = false;
     private bool alreadyJumped = false;
     private bool damageCooldown = false;
+    [HideInInspector] public bool isRunning = false; // Lets enemies know if the player is running or not
 
     private Vector2 moveVector;
     private Vector2 currentVelocity;
+    private Vector2 colliderSizeVector;
 
     [Header("Components and Objects")]
     [SerializeField] private Rigidbody2D playerRigidBody;
+    [SerializeField] private GameObject staminaShieldObject; // The stamina shield object
+    [SerializeField] private BoxCollider2D boxCollider; // The box collider component
 
     [Header("Walking attributes")]
     [SerializeField] private float movementSpeed = 3f;
@@ -30,13 +34,17 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float staminaRechargeRate; // How fast the stamina recharges
     [SerializeField] private float runningSpeed; // How fast the player moves when running
     [HideInInspector] public float stamina; // The stamina the player has currently
+
     private bool allowedToRun = true; // This is primarily used for when player depletes the stamina and therefore is not allowed to run after that 
 
     private void Start()
     {
         stamina = maxStamina; // Always starts with as much stamina as possible
+        staminaShieldObject.SetActive(false);
 
         moveVector = new Vector2(0, 0); // Initializing the movementVector
+        colliderSizeVector = Vector2.one;
+
     }
 
     private void Update()
@@ -45,6 +53,7 @@ public class PlayerMovement : MonoBehaviour
 
         HandleWalkingAndRunning();
         HandleJumping();
+        HandleStaminaShield();
 
     }
 
@@ -57,6 +66,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (isJumping && !alreadyJumped)
         {
+            currentVelocity.y = Mathf.Max(0, currentVelocity.y);
+            playerRigidBody.velocity = currentVelocity;
             playerRigidBody.AddForce(Vector2.up * jumpForce, ForceMode2D.Force);
             alreadyJumped = true;
         }
@@ -74,10 +85,11 @@ public class PlayerMovement : MonoBehaviour
         moveVector.y = currentVelocity.y;
 
         bool isPlayerMoving = moveHorizontal != 0f;
-        bool isPlayerRunning = isPlayerMoving && Input.GetKey(KeyCode.LeftShift);
+        bool isPlayerRunning = Input.GetKey(KeyCode.LeftShift);
 
         if (isPlayerRunning && allowedToRun)
         {
+            
             moveVector.x = moveHorizontal * runningSpeed;
             HandlePlayerRunning();
 
@@ -86,7 +98,8 @@ public class PlayerMovement : MonoBehaviour
             {
                 allowedToRun = false;
             }
-        } else
+        }
+        else
         {
             moveVector.x = moveHorizontal * movementSpeed;
             HandlePlayerWalking(isPlayerMoving);
@@ -132,6 +145,30 @@ public class PlayerMovement : MonoBehaviour
         {
             stamina = Mathf.Min(maxStamina, stamina + (staminaRechargeRate * Time.deltaTime));
         }
+    }
+
+    private void HandleStaminaShield()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftShift) && allowedToRun)
+        {
+            isRunning = true;
+            colliderSizeVector.x = 1.5f; colliderSizeVector.y = 1.5f;
+            boxCollider.size = colliderSizeVector;
+            staminaShieldObject.SetActive(true);
+
+        } 
+        else if (Input.GetKeyUp(KeyCode.LeftShift) || !allowedToRun)
+        {
+            isRunning = false;
+            colliderSizeVector.x = 1f; colliderSizeVector.y = 1f;
+            boxCollider.size = colliderSizeVector;
+            staminaShieldObject.SetActive(false);
+        } // Set the stamina shield as inactive when not running
+    }
+
+    public void OnStaminaShieldProtect()
+    {
+        stamina -= GameManager.instance.staminaShieldControllerScript.enemyKnockbackStaminaPenalty;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
