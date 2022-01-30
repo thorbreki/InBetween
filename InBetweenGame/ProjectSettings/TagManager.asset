@@ -11,11 +11,12 @@ TagManager:
   - LevelBorder
   - StomperBorder
   - Shield
+  - PlayerShield
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - UnBouncyEnemy
   - Water
   - UI
   - Player
@@ -26,8 +27,8 @@ TagManager:
   - RollerEnemy
   - LevelBorder
   - Shield
-  - 
-  - 
+  - Enemies
+  - Bouncy
   - 
   - 
   - 

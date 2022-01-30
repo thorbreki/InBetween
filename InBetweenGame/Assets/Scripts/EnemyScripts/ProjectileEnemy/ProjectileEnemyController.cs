@@ -27,6 +27,12 @@ public class ProjectileEnemyController : MonoBehaviour
     [SerializeField] private Color normalColor;
     [SerializeField] private Color paralyzedColor;
 
+    [Header("Player Shield functionality")]
+    [SerializeField] private GameObject playerShieldObject;
+    [SerializeField] private BoxCollider2D boxCollider;
+    [SerializeField] private int playerShieldDamage;
+    private Coroutine playerShieldModeCoroutine;
+
     private float projectileSpeed; // The speed of the projectiles this enemy shoots
     private float projectileCooldown; // The seconds between the enemy can shoot projectiles
     private int targetSideOfPlayer; // The enemy will always want to be either side of the player. 0 = left of player, 1 = right of player
@@ -50,6 +56,10 @@ public class ProjectileEnemyController : MonoBehaviour
 
     private void Start()
     {
+        // Initialize objects and components
+        playerShieldObject.SetActive(false);
+        boxCollider.size = new Vector2(1, 1);
+
         targetDistanceFromGround = Random.Range(minDistance, maxDistance); // Make the enemy randomly far from the floor
         targetXDistanceFromPlayer = Random.Range(minDistance, maxDistance); // Make the enemy randomly far from the player on the x coordinate
 
@@ -159,7 +169,7 @@ public class ProjectileEnemyController : MonoBehaviour
     {
         if (shieldControllerScript == null) { shieldControllerScript = collider.gameObject.GetComponent<ShieldController>(); } // Get the shield controller script if not already
 
-        if (paralyzeCoroutine != null) { StopCoroutine(paralyzeCoroutine); } // Stop previous paralyzation if it is currently active
+        if (isParalyzed) { return; } // Stop previous paralyzation if it is currently active
         paralyzeCoroutine = StartCoroutine(ParalyzeCor(shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
 
         // Call the playercombat script through the shield object to make the player lose the correct amount of energy
@@ -171,12 +181,20 @@ public class ProjectileEnemyController : MonoBehaviour
         // Make sure all shooting is stopped
         if (shootPlayerCoroutine != null) { StopCoroutine(shootPlayerCoroutine); } // Stop the shooting coroutine
         if (movementCoroutine != null) { StopCoroutine(movementCoroutine); } // Stop all movement!
+        gameObject.layer = 14; // Setting the enemy to the enemies layer to bounce of walls and interact with all other enemies
         spriteRenderer.color = paralyzedColor;
         yield return new WaitForSeconds(secondsOfParalyzation);
-        isParalyzed = false; // No longer paralyzed
+        gameObject.layer = 9; // Setting the object back to the projectile enemy layer
         spriteRenderer.color = normalColor;
+
+        // Take away Player Shield mode just in case
+        playerShieldObject.SetActive(false);
+        gameObject.tag = "Enemy";
+        boxCollider.size = Vector2.one;
+
         movementCoroutine = StartCoroutine(MoveTowardsPlayer()); // Movement again!
         shootPlayerCoroutine = StartCoroutine(ShootPlayerCor()); // Start shooting again
+        isParalyzed = false; // No longer paralyzed
     }
 
     private void OnTriggerEnter2D(Collider2D collider)
@@ -195,27 +213,39 @@ public class ProjectileEnemyController : MonoBehaviour
             {
                 knockBackVector = transform.position - playerTransform.position;
                 healthScript.TakeDamage(1);
-                if (!isParalyzed)
-                {
-                    print("Pushing enemy back!");
-                    rigidBody.AddForce(knockBackVector.normalized * GameManager.instance.staminaShieldControllerScript.knockbackForce, ForceMode2D.Impulse);
-                }
+                rigidBody.AddForce(knockBackVector.normalized * GameManager.instance.staminaShieldControllerScript.knockbackForce, ForceMode2D.Impulse);
+                
                 if (isParalyzed)
                 {
-                    rigidBody.AddForce(knockBackVector.normalized * GameManager.instance.staminaShieldControllerScript.knockbackForce, ForceMode2D.Impulse);
+                    StartCoroutine(PlayerShieldModeCor());
                 }
                 GameManager.instance.playerMovementScript.OnStaminaShieldProtect();
             }
-            else // Player does not have stamina shield active so hurt him!
+            else if (!isParalyzed) // Player does not have stamina shield active so hurt him!
             {
                 GameManager.instance.playerCombatScript.TakeDamage(2);
-                Destroy(gameObject);
             }
+        }
+
+        else if (collision.transform.CompareTag("PlayerShield"))
+        {
+            healthScript.TakeDamage(1);
         }
     }
 
+
+    private IEnumerator PlayerShieldModeCor()
+    {
+        yield return new WaitForSeconds(0.1f);
+        playerShieldObject.SetActive(true); // Set the Player Shield sprite renderer object active
+        gameObject.tag = "PlayerShield"; // Change the tag so other enemies know what they are colliding with
+        boxCollider.size = playerShieldObject.transform.localScale; // Set the collider to be as big as the Player Shield
+    }
+
+
     private void OnDestroy()
     {
-        Destroy(gameObject);
+        StopAllCoroutines();
+        //Destroy(gameObject);
     }
 }

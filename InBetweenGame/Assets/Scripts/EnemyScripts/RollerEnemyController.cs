@@ -6,9 +6,9 @@ public class RollerEnemyController : MonoBehaviour
 {
     public Transform playerTransform;
 
-    [SerializeField] Rigidbody2D rigidBody; // The Roller's rigidBody component
-    [SerializeField] SpriteRenderer spriteRenderer; // The Roller's SpriteRenderer component
-                     public PlayerCombat playerCombatScript; // The Player's combat script
+    [SerializeField] private Rigidbody2D rigidBody; // The Roller's rigidBody component
+    [SerializeField] private SpriteRenderer spriteRenderer; // The Roller's SpriteRenderer component
+    [SerializeField] private EnemyHealthController healthScript; // The Roller's health controller script
 
     // The range of how much force the Roller adds to its rigidbody when trying to roll into the player
     [SerializeField] private float minMovementForce;
@@ -26,12 +26,16 @@ public class RollerEnemyController : MonoBehaviour
     [SerializeField] private Color normalColor;
     [SerializeField] private Color paralyzedColor;
 
+    [Header("Player Shield functionality")]
+    [SerializeField] private GameObject playerShieldObject;
+    [SerializeField] private CircleCollider2D circleCollider;
+    [SerializeField] private int playerShieldDamage;
+    private Coroutine playerShieldModeCoroutine;
+
     private float movementForce; // How much force is added to the Roller when trying to roll into the player
     private float movementSpeedLimit; // How fast the Roller can go before stop being able to add force to itself (its maximum speed)
 
-
     // SHIELD FUNCTIONALITY
-    private ShieldController shieldControllerScript; // The shield's controller script to know important info
     private bool isParalyzed = false;
     private Coroutine paralyzeCoroutine; // Coroutine object for when the enemy gets paralyzed by the shield
     private Vector2 knockBackVector; // The vector that knocks the enemy back
@@ -42,6 +46,10 @@ public class RollerEnemyController : MonoBehaviour
 
     private void Start()
     {
+        // Initialize objects and components
+        playerShieldObject.SetActive(false);
+        circleCollider.radius = 0.5f;
+
         // Initializing the movement values so they can be used
         movementForce = Random.Range(minMovementForce, maxMovementForce);
         movementSpeedLimit = Random.Range(minMovementSpeed, maxMovementSpeed);
@@ -55,14 +63,12 @@ public class RollerEnemyController : MonoBehaviour
     /// <param name="collision"></param>
     private void OnShieldCollision(Collider2D collider)
     {
-        if (shieldControllerScript == null) { shieldControllerScript = collider.gameObject.GetComponent<ShieldController>(); } // Get the shield controller script if not already
-
         // Paralyze the Rolller
         if (paralyzeCoroutine != null) { StopCoroutine(paralyzeCoroutine); } // Stop previous paralyzation if it is currently active
-        paralyzeCoroutine = StartCoroutine(ParalyzeCor(shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
+        paralyzeCoroutine = StartCoroutine(ParalyzeCor(GameManager.instance.shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
 
         // Call the playercombat script through the shield object to make the player lose the correct amount of energy
-        shieldControllerScript.playerCombatScript.OnShieldProtect();
+        GameManager.instance.playerCombatScript.OnShieldProtect();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -76,21 +82,43 @@ public class RollerEnemyController : MonoBehaviour
         }
 
         // This code runs when the Roller lands on the ground for the first time, thus starting the movement process
-        else if (collision.transform.CompareTag("Ground") && attackPlayerCor == null)
+        else if (collision.transform.CompareTag("LevelBorder") && attackPlayerCor == null)
         {
             attackPlayerCor = StartCoroutine(AttackPlayerCoroutine());
+            return;
         }
 
-        // TODO: ADD WHEN IT COLLIDES WITH PLAYER
-        else if (!isParalyzed && collision.transform.CompareTag("Player"))
+        // Colliding with a Player Shield
+        else if (collision.transform.CompareTag("PlayerShield"))
         {
-            playerCombatScript.TakeDamage(2);
+            healthScript.TakeDamage(1);
+        }
+
+        // When it collides with player
+        else if (collision.transform.CompareTag("Player"))
+        {
+            if (GameManager.instance.playerMovementScript.isRunning)
+            {
+                knockBackVector = transform.position - playerTransform.position;
+                healthScript.TakeDamage(1);
+                rigidBody.AddForce(knockBackVector.normalized * GameManager.instance.staminaShieldControllerScript.knockbackForce, ForceMode2D.Impulse);
+
+                if (isParalyzed)
+                {
+                    StartCoroutine(PlayerShieldModeCor());
+                }
+                GameManager.instance.playerMovementScript.OnStaminaShieldProtect();
+            }
+            else if (!isParalyzed) // Player does not have stamina shield active so hurt him!
+            {
+                GameManager.instance.playerCombatScript.TakeDamage(2);
+            }
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collider.CompareTag("Shield"))
+        if (collider.CompareTag("Shield") && !isParalyzed)
         {
             OnShieldCollision(collider);
         }
@@ -115,14 +143,30 @@ public class RollerEnemyController : MonoBehaviour
         }
     }
 
+    private IEnumerator PlayerShieldModeCor()
+    {
+        yield return new WaitForSeconds(0.1f);
+        playerShieldObject.SetActive(true); // Set the Player Shield sprite renderer object active
+        gameObject.tag = "PlayerShield"; // Change the tag so other enemies know what they are colliding with
+        circleCollider.radius = playerShieldObject.transform.localScale.x / 2; // Set the collider to be as big as the Player Shield
+    }
+
     private IEnumerator ParalyzeCor(float secondsOfParalyzation)
     {
         isParalyzed = true;
         // Make sure all movement and attacks are completely stopped
         if (attackPlayerCor != null) { StopCoroutine(attackPlayerCor); }
         spriteRenderer.color = paralyzedColor;
+        gameObject.layer = 3; // Set the Roller to layer "UnBouncy enemy" so he collides with all other enemies but does not bounce
         yield return new WaitForSeconds(secondsOfParalyzation);
         spriteRenderer.color = normalColor;
+        gameObject.layer = 11; // Go back to RollerEnemy layer
+
+        // Take away Player Shield mode just in case
+        playerShieldObject.SetActive(false);
+        gameObject.tag = "Enemy";
+        circleCollider.radius = 0.5f;
+
         attackPlayerCor = StartCoroutine(AttackPlayerCoroutine()); // Start moving again!
         isParalyzed = false;
     }
@@ -135,4 +179,8 @@ public class RollerEnemyController : MonoBehaviour
         return speedingRightIntoRightWall || speedingLeftIntoLeftWall;
     }
 
+    private void OnDestroy()
+    {
+        StopAllCoroutines();
+    }
 }

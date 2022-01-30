@@ -58,7 +58,7 @@ public class EnemySpawnController : MonoBehaviour
     {
         while (!Input.GetKey(KeyCode.Escape))
         {
-            int randomEnemyNumber = Random.Range(2, 3); // The number which will decide which enemy type gets spawned
+            int randomEnemyNumber = Random.Range(4, 5); // The number which will decide which enemy type gets spawned
             GameObject newEnemy;
 
             switch (randomEnemyNumber)
@@ -80,7 +80,6 @@ public class EnemySpawnController : MonoBehaviour
                     newEnemy = SpawnEnemy(rollerEnemyObject);
                     RollerEnemyController rollerScript = newEnemy.GetComponent<RollerEnemyController>();
                     rollerScript.playerTransform = playerTransform;
-                    rollerScript.playerCombatScript = playerCombatScript;
                     break;
             }
             yield return new WaitForSeconds(spawnCooldown);

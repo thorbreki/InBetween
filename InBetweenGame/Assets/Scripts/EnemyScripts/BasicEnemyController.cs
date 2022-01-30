@@ -14,6 +14,12 @@ public class BasicEnemyController : MonoBehaviour
     [SerializeField] private Color normalColor;
     [SerializeField] private Color paralyzedColor;
 
+    [Header("Player Shield functionality")]
+    [SerializeField] private GameObject playerShieldObject;
+    [SerializeField] private BoxCollider2D boxCollider;
+    [SerializeField] private int playerShieldDamage;
+    private Coroutine playerShieldModeCoroutine;
+
     private float movementSpeed;
     private Coroutine moveToPlayerCoroutine; // Coroutine object for enemy moving towards player
 
@@ -22,11 +28,16 @@ public class BasicEnemyController : MonoBehaviour
     private Coroutine paralyzeCoroutine; // Coroutine object for when the enemy gets paralyzed by the shield
     private Vector2 knockBackVector; // The vector that knocks the enemy back
 
+
     private Vector2 toPlayerVector; // The vector which keeps track of what the actual direction the enemy wants to go to
     private Vector2 currVelocity; // Vector for storing the current movement velocity
 
     private void Start()
     {
+        // Initialize objects and components
+        playerShieldObject.SetActive(false);
+        boxCollider.size = new Vector2(1, 1);
+
         // Initialize values
         playerTransform = GameManager.instance.playerTransform;
         movementSpeed = Random.Range(minMovementSpeed, maxMovementSpeed);
@@ -84,7 +95,7 @@ public class BasicEnemyController : MonoBehaviour
     /// <param name="collision"></param>
     private void OnShieldCollision(Collider2D collider)
     {
-        if (paralyzeCoroutine != null) { StopCoroutine(paralyzeCoroutine); } // Stop previous paralyzation if it is currently active
+        if (isParalyzed) { return; } // If previous paralyzation already active, don't do anything
         paralyzeCoroutine = StartCoroutine(ParalyzeCor(GameManager.instance.shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
 
         // Call the playercombat script through the shield object to make the player lose the correct amount of energy
@@ -110,23 +121,33 @@ public class BasicEnemyController : MonoBehaviour
             {
                 knockBackVector = transform.position - playerTransform.position;
                 healthScript.TakeDamage(1);
-                if (!isParalyzed)
-                {
-                    print("Pushing enemy back!");
-                    rb.AddForce(knockBackVector.normalized * GameManager.instance.staminaShieldControllerScript.knockbackForce, ForceMode2D.Impulse);
-                }
+                rb.AddForce(knockBackVector.normalized * GameManager.instance.staminaShieldControllerScript.knockbackForce, ForceMode2D.Impulse);
+
+                // The basic enemy spawns in the Player Shield to hurt other enemies
                 if (isParalyzed)
                 {
-                    rb.AddForce(knockBackVector.normalized * GameManager.instance.staminaShieldControllerScript.knockbackForce, ForceMode2D.Impulse);
+                    StartCoroutine(PlayerShieldModeCor());
                 }
                 GameManager.instance.playerMovementScript.OnStaminaShieldProtect();
             }
-            else // Player does not have stamina shield active so hurt him!
+            else if (!isParalyzed) // Player does not have stamina shield active so hurt him!
             {
                 GameManager.instance.playerCombatScript.TakeDamage(2);
                 Destroy(gameObject);
             }
         }
+        else if (collision.transform.CompareTag("PlayerShield"))
+        {
+            healthScript.TakeDamage(1);
+        }
+    }
+
+    private IEnumerator PlayerShieldModeCor()
+    {
+        yield return new WaitForSeconds(0.1f);
+        playerShieldObject.SetActive(true); // Set the Player Shield sprite renderer object active
+        gameObject.tag = "PlayerShield"; // Change the tag so other enemies know what they are colliding with
+        boxCollider.size = playerShieldObject.transform.localScale; // Set the collider to be as big as the Player Shield
     }
 
     /* PARALYZATION METHODS */
@@ -139,13 +160,24 @@ public class BasicEnemyController : MonoBehaviour
     {
         isParalyzed = true;
         StopCoroutine(moveToPlayerCoroutine);
-        rb.gravityScale = 1f;
+        gameObject.layer = 14; // Set layer to Enemies, it collides with other enemies and bounces of walls
         spriteRenderer.color = paralyzedColor;
         yield return new WaitForSeconds(secondsOfParalyzation);
-        rb.gravityScale = 0f;
+        gameObject.layer = 8; // Setting the layer to Basic Enemy layer yet again
         spriteRenderer.color = normalColor;
+
+        // Take away Player Shield mode just in case
+        playerShieldObject.SetActive(false);
+        gameObject.tag = "Enemy";
+        boxCollider.size = Vector2.one;
+
         moveToPlayerCoroutine = StartCoroutine(MoveTowardsPlayer());
         isParalyzed = false;
     }
 
+
+    private void OnDestroy()
+    {
+        StopAllCoroutines();
+    }
 }
