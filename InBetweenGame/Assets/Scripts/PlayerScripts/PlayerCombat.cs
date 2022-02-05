@@ -8,21 +8,34 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private PlayerMovement playerMovementScript; // The player movement script attached to the player
     [SerializeField] private GameObject shootEffectObject; // The object which shows where the player shot
     [SerializeField] private GameObject shieldObject; // The shield object that protects the player
+    [SerializeField] private CanvasFunctions canvasFunctionsScript; // The script for the canvas functions
+    [SerializeField] private GameObject bombPrefab; // The bomb prefab the player can shoot from the gun
 
     [Header("Shooting Attributes")]
     [SerializeField] private LayerMask shootLayerMask; // The Layer Mask for player shooting
     [SerializeField] private float shootDistance; // The distance the player can shoot
     [SerializeField] public float maxGunEnergy = 10f; // The max energy the player's gun can have
-    [SerializeField] private float ShootEnergyPenalty = 2f; // The amount of energy the gun loses when shooting
+    [SerializeField] private float PistolEnergyPenalty = 2f; // The amount of energy the gun loses when shooting in pistol mode
+    [SerializeField] private float BombEnergyPenalty = 0f; // The amount of energy the gun loses when shooting in bomb mode
     [SerializeField] private float gunEnergyRechargeRate = 0.1f; // The rate of recharging for the gun's energy
     [SerializeField] private float shootingInaccuracy = 0.0f; // How inaccurate the player's shooting is
+
+    [Header("Bomb Attributes")]
+    public float explosionRadius;
+    public float explosionTimeToLive;
+    public float explosionParalyzationSeconds; // How long the bomb paralyzes the enemies
+    public float explosionMaxForce;
+
+    private enum GunMode
+    {
+        Pistol,
+        Bomb
+    }
+    private GunMode gunMode; // The mode the gun is in 
 
     [Header("Health")]
     [SerializeField] private int maxHealth = 1; // The player's possible max health
     [SerializeField] private HealthBarController healthBarController; // The script for the health bar
-
-    [Header("Teleport Attributes")]
-    [SerializeField] private float teleportEnergyPenalty; // How much energy the Player uses when teleporting
 
     [Header("Shields Attributes")]
     [SerializeField] private float coolDownSeconds; // How much time (in seconds) does the shield need to be used again
@@ -34,6 +47,7 @@ public class PlayerCombat : MonoBehaviour
 
     [HideInInspector] public float gunEnergy; // The energy the player's gun has
 
+
     private int health; // The player's health
 
     // Coroutines
@@ -41,6 +55,8 @@ public class PlayerCombat : MonoBehaviour
 
     // Useful stuff
     private Vector2 groundVector; // Normalized vector representing the ground, which goes straight to the right
+    private Vector3 mousePosition; // Position of the mouse
+    private Vector3 attackDirection; // direction of the player's attack
 
     private void Start()
     {
@@ -50,30 +66,43 @@ public class PlayerCombat : MonoBehaviour
 
         // Initialize vectors
         groundVector = new Vector2(1, 0);
+        mousePosition = Vector3.zero;
+        attackDirection = Vector3.zero;
     }
 
     private void Update()
     {
-        HandlePlayerAttack();
+        switch (gunMode)
+        {
+            case GunMode.Pistol:
+                HandlePlayerPistolAttack();
+                break;
+            case GunMode.Bomb:
+                HandlePlayerBombAttack();
+                break;
+            default:
+                break;
+        }
         HandleShield();
         HandleGunEnergy(); // Handle the regeneration of the gun's energy if and only if no active abilities are turned on (for instance, using the shield)
+        HandleGunMode(); // Allow the player to switch between gun modes
     }
 
     /// <summary>
-    /// This function handles the attack mechanism of the player
+    /// This function handles the pistol attack mechanism of the player
     /// </summary>
-    private void HandlePlayerAttack()
+    private void HandlePlayerPistolAttack()
     {
         // When player presses left mouse button, instantiate projectile
         if (Input.GetMouseButtonDown(0))
         {
-            if (gunEnergy < ShootEnergyPenalty)
+            if (gunEnergy < PistolEnergyPenalty)
                 return; // You don't want to do anything if the player doesn't have enough energy to shoot
 
-            gunEnergy -= ShootEnergyPenalty; // When player shoots, always loses energy
+            gunEnergy -= PistolEnergyPenalty; // When player shoots, always loses energy
 
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 attackDirection = Quaternion.Euler(0f, 0f, Random.Range(-shootingInaccuracy, shootingInaccuracy)) * (mousePosition - transform.position);
+            mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            attackDirection = Quaternion.Euler(0f, 0f, Random.Range(-shootingInaccuracy, shootingInaccuracy)) * (mousePosition - transform.position);
             RaycastHit2D hit = Physics2D.Raycast(transform.position, attackDirection, shootDistance, shootLayerMask);
 
             if (hit.collider) {
@@ -96,6 +125,26 @@ public class PlayerCombat : MonoBehaviour
             {
                 Instantiate(shootEffectObject, transform.position, Quaternion.Euler(0, 0, Vector2.Angle(attackDirection, groundVector)));
             }
+        }
+    }
+
+    /// <summary>
+    /// This function handles the player bomb attack functionality
+    /// </summary>
+    private void HandlePlayerBombAttack()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (gunEnergy < BombEnergyPenalty) { return; } // You don't want to do anything if the player doesn't have enough energy to shoot bombs
+
+            gunEnergy -= BombEnergyPenalty; // When player shoots, always lose energy
+
+            mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            attackDirection = Quaternion.Euler(0f, 0f, Random.Range(-shootingInaccuracy, shootingInaccuracy)) * (mousePosition - transform.position);
+
+            // Spawn in Bomb object
+            GameObject bomb = Instantiate(bombPrefab, transform.position, transform.rotation);
+            bomb.GetComponent<BombController>().StartBomb(transform.position, mousePosition);
         }
     }
 
@@ -137,6 +186,22 @@ public class PlayerCombat : MonoBehaviour
         {
             GameManager.instance.PlayerDied();
         }
+    }
+
+    /// <summary>
+    /// Handle the player wanting to change between gun modes
+    /// </summary>
+    private void HandleGunMode()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1)) { ChangeGunMode(GunMode.Pistol); }
+        else if (Input.GetKeyDown(KeyCode.Alpha2)) { ChangeGunMode(GunMode.Bomb); }
+    }
+
+    private void ChangeGunMode(GunMode newGunMode)
+    {
+        gunMode = newGunMode;
+        canvasFunctionsScript.ChangeGunModeText(newGunMode.ToString());
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

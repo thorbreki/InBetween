@@ -111,6 +111,37 @@ public class BasicEnemyController : MonoBehaviour
             OnShieldCollision(collider);
             return;
         }
+        else if (collider.name == "Bomb(Clone)") // Being caught in an explosion
+        {
+            healthScript.TakeDamage(2); // Take damage
+            float distance = Vector2.Distance(transform.position, collider.transform.position);
+            float distanceMultiplier = Mathf.Max(1 - (distance / GameManager.instance.playerCombatScript.explosionRadius), 0f); // The farther the enemy is from explosion, less force
+            print("distanceMultiplier: " + distanceMultiplier);
+
+            // If the enemy is within the nearer half of the explosion: 2 damage, get paralyzed and Player Shield activate!
+            if (distance <= (GameManager.instance.playerCombatScript.explosionRadius / 2f))
+            {
+                // Get paralyzed
+                if (isParalyzed) { return; } // If previous paralyzation already active, don't do anything
+                paralyzeCoroutine = StartCoroutine(ParalyzeCor(GameManager.instance.playerCombatScript.explosionParalyzationSeconds)); // Start paralyzing the enemy
+
+                // Get knocked away from explosion
+                rb.velocity = Vector2.zero; // To make sure the enemy gets knocked away from the explosion always the same amount of force no matter what
+                rb.AddForce(distanceMultiplier * (GameManager.instance.playerCombatScript.explosionMaxForce * (transform.position - collider.transform.position).normalized), ForceMode2D.Impulse);
+
+                StartCoroutine(PlayerShieldModeCor()); // Then, go into Player Shield mode
+            }
+            else
+            {
+                // Get knocked away from explosion
+                rb.velocity = Vector2.zero; // To make sure the enemy gets knocked away from the explosion always the same amount of force no matter what
+                rb.AddForce(distanceMultiplier * (GameManager.instance.playerCombatScript.explosionMaxForce * (transform.position - collider.transform.position).normalized), ForceMode2D.Impulse);
+            }
+
+            // NOTICE: The reason why there are two rb.AddForce lines instead of just one, is because this ensures that the enemy is paralyzed before being
+            // pushed away from the bomb if it is close enough, so it will always go as fast it is supposed to. That would not be ensured if I would start
+            // pushin the enemy away before paralyzing it
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

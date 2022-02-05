@@ -58,7 +58,7 @@ public class EnemySpawnController : MonoBehaviour
     {
         while (!Input.GetKey(KeyCode.Escape))
         {
-            int randomEnemyNumber = Random.Range(4, 5); // The number which will decide which enemy type gets spawned
+            int randomEnemyNumber = Random.Range(1, 2); // The number which will decide which enemy type gets spawned
             GameObject newEnemy;
 
             switch (randomEnemyNumber)

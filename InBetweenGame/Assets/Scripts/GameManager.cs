@@ -7,11 +7,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject gameRunningUI; // The UI which is visible when the game is running
     [SerializeField] private GameObject gameOverUI; // The UI which is visible when the player is dead
     [SerializeField] private TextMeshProUGUI coinUIText;
+    
     public Transform playerTransform;
     public PlayerMovement playerMovementScript;
     public PlayerCombat playerCombatScript;
     public StaminaShieldController staminaShieldControllerScript;
     public ShieldController shieldControllerScript;
+    public BombController bombControllerScript;
 
     private int coinCount = 0;
     public static GameManager instance;

@@ -76,7 +76,6 @@ public class RollerEnemyController : MonoBehaviour
         // When Roller speeds up into a wall, it must stop trying to move and start over
         if (collision.transform.CompareTag("LevelBorder") && isSpeedingIntoAWall()) // The Roller just bumped into a wall but is still trying to speed up
         {
-            print("Whoops, just bumped into a wall. Starting over :)");
             if (attackPlayerCor != null) { StopCoroutine(attackPlayerCor); }
             attackPlayerCor = StartCoroutine(AttackPlayerCoroutine());
         }
