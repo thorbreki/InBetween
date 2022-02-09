@@ -12,6 +12,7 @@ TagManager:
   - StomperBorder
   - Shield
   - PlayerShield
+  - PlayerShield2
   layers:
   - Default
   - TransparentFX

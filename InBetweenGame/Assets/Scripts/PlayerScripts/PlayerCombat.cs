@@ -106,10 +106,10 @@ public class PlayerCombat : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(transform.position, attackDirection, shootDistance, shootLayerMask);
 
             if (hit.collider) {
-                print(hit.collider.transform.name);
+                //print(hit.collider.transform.name);
 
                 // If shot hits enemy, then damage that enemy
-                if (hit.transform.tag == "Enemy")
+                if (hit.transform.tag == "Enemy" || hit.transform.tag == "PlayerShield" || hit.transform.tag == "PlayerShield2")
                 {
                     DamageEnemy(hit.transform);
                 }

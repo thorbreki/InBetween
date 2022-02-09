@@ -262,5 +262,9 @@ MonoBehaviour:
   normalColor: {r: 0, g: 1, b: 0.15686275, a: 1}
   paralyzedColor: {r: 0.35978106, g: 0.7264151, b: 0.41729227, a: 1}
   playerShieldObject: {fileID: 500460913630353696}
+  playerShieldSpriteRenderer: {fileID: 327008674268537728}
+  playerShieldColor: {r: 0, g: 0.9960785, b: 0.9803922, a: 1}
+  playerShield2Color: {r: 1, g: 0.64705884, b: 0, a: 1}
   boxCollider: {fileID: 8983535167100375051}
   playerShieldDamage: 1
+  doubleDamageSpeedLimit: 10

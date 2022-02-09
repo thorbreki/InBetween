@@ -16,9 +16,15 @@ public class BasicEnemyController : MonoBehaviour
 
     [Header("Player Shield functionality")]
     [SerializeField] private GameObject playerShieldObject;
+    [SerializeField] private SpriteRenderer playerShieldSpriteRenderer;
+    [SerializeField] private Color playerShieldColor; // Player Shield 1 color
+    [SerializeField] private Color playerShield2Color; // Player Shield 2 color
     [SerializeField] private BoxCollider2D boxCollider;
-    [SerializeField] private int playerShieldDamage;
+    [SerializeField] private int playerShieldDamage; // Base Player Shield damage
+    [SerializeField] private float doubleDamageSpeedLimit;
+    private float sqrDoubleDamageSpeedLimit;
     private Coroutine playerShieldModeCoroutine;
+    private bool isPlayerShield = false; // To let other parts of the code know that the enemy is currently a Player Shield 
 
     private float movementSpeed;
     private Coroutine moveToPlayerCoroutine; // Coroutine object for enemy moving towards player
@@ -41,6 +47,7 @@ public class BasicEnemyController : MonoBehaviour
         // Initialize values
         playerTransform = GameManager.instance.playerTransform;
         movementSpeed = Random.Range(minMovementSpeed, maxMovementSpeed);
+        sqrDoubleDamageSpeedLimit = doubleDamageSpeedLimit * doubleDamageSpeedLimit;
 
 
         // Initialize vectors
@@ -49,6 +56,14 @@ public class BasicEnemyController : MonoBehaviour
         knockBackVector = Vector2.zero;
         moveToPlayerCoroutine = StartCoroutine(MoveTowardsPlayer());
 
+    }
+
+    private void Update()
+    {
+        if (isPlayerShield)
+        {
+            ManagePlayerShieldSpeedDamage();
+        }
     }
 
     /* MOVEMENT METHODS */
@@ -169,16 +184,39 @@ public class BasicEnemyController : MonoBehaviour
         }
         else if (collision.transform.CompareTag("PlayerShield"))
         {
-            healthScript.TakeDamage(1);
+            healthScript.TakeDamage(playerShieldDamage);
+        }
+        else if (collision.transform.CompareTag("PlayerShield2"))
+        {
+            healthScript.TakeDamage(playerShieldDamage * 2);
         }
     }
 
     private IEnumerator PlayerShieldModeCor()
     {
         yield return new WaitForSeconds(0.1f);
+        isPlayerShield = true;
+        ManagePlayerShieldSpeedDamage(); // Just to make sure the color will be correct when first initializing
         playerShieldObject.SetActive(true); // Set the Player Shield sprite renderer object active
         gameObject.tag = "PlayerShield"; // Change the tag so other enemies know what they are colliding with
         boxCollider.size = playerShieldObject.transform.localScale; // Set the collider to be as big as the Player Shield
+    }
+
+    /// <summary>
+    /// Only runs when player shield is active. Handles the damage and color of the Player Shield according to the paralyzed enemy's movement speed
+    /// </summary>
+    private void ManagePlayerShieldSpeedDamage()
+    {
+        if (rb.velocity.sqrMagnitude < sqrDoubleDamageSpeedLimit)
+        {
+            if (!gameObject.CompareTag("PlayerShield")) { gameObject.tag = "PlayerShield"; } // Change tag so other enemies know the correct tag
+            playerShieldSpriteRenderer.color = playerShieldColor; // Set the color
+        }
+        else
+        {
+            if (!gameObject.CompareTag("PlayerShield2")) { gameObject.tag = "PlayerShield2"; } // Change tag so other enemies know the correct tag
+            playerShieldSpriteRenderer.color = playerShield2Color; // Set the color
+        }
     }
 
     /* PARALYZATION METHODS */
@@ -199,6 +237,7 @@ public class BasicEnemyController : MonoBehaviour
 
         // Take away Player Shield mode just in case
         playerShieldObject.SetActive(false);
+        isPlayerShield = false;
         gameObject.tag = "Enemy";
         boxCollider.size = Vector2.one;
 

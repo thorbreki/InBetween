@@ -2064,8 +2064,8 @@ MonoBehaviour:
   spawnYLevel: 18
   minXSpawn: -24
   maxXSpawn: 24
-  beginningSpawningCooldown: 5
-  spawningSpeedUp: 0.5
+  beginningSpawningCooldown: 10
+  spawningSpeedUp: 0.3
   speedUpCoolDownSec: 20
 --- !u!1 &1369621477
 GameObject:
@@ -2307,7 +2307,7 @@ MonoBehaviour:
   explosionRadius: 5
   explosionTimeToLive: 1
   explosionParalyzationSeconds: 4
-  explosionMaxForce: 15
+  explosionMaxForce: 30
   maxHealth: 8
   healthBarController: {fileID: 257941218}
   coolDownSeconds: 0
