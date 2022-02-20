@@ -1,0 +1,10 @@
+HEIÐAR
+
+- Stompers spawna stundum fyrir ofan player, unaccaptable!
+- Enemies ættu að taka meira damage þegar þeir hitta veggina, according to their speed
+- Ekki nógu clear hvenær playerinn meiðir sig
+- Færa gæa með skildinum væri gott að fá það aftur, að geta skipt á milli því og nýja skyldinum
+- Líkar við living shot
+- Gravity shot (hópar enemies saman og springur eftir smá tíma)
+- Likes it (loves it!)
+

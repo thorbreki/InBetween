@@ -26,6 +26,9 @@ public class ProjectileEnemyController : MonoBehaviour
     [Header("Paralyzed Attributes")]
     [SerializeField] private Color normalColor;
     [SerializeField] private Color paralyzedColor;
+    [SerializeField] private float wallDamageMagnitudeLimit;
+    [SerializeField] private float wallCollisionDamage;
+    private float sqrWallDamageMagnitudeLimit;
 
     [Header("Player Shield functionality")]
     [SerializeField] private GameObject playerShieldObject;
@@ -74,6 +77,7 @@ public class ProjectileEnemyController : MonoBehaviour
 
         targetSideOfPlayer = Random.Range(0, 2);
         sqrDoubleDamageSpeedLimit = doubleDamageSpeedLimit * doubleDamageSpeedLimit;
+        sqrWallDamageMagnitudeLimit = wallDamageMagnitudeLimit * wallDamageMagnitudeLimit;
 
         // Initialize the vectors so they can be used
         toPlayerVector = Vector2.zero;
@@ -206,6 +210,7 @@ public class ProjectileEnemyController : MonoBehaviour
         // Take away Player Shield mode just in case
         playerShieldObject.SetActive(false);
         isPlayerShield = false;
+        rigidBody.mass = 1;
         gameObject.tag = "Enemy";
         boxCollider.size = Vector2.one;
 
@@ -232,7 +237,10 @@ public class ProjectileEnemyController : MonoBehaviour
             if (distanceMultiplier >= 0.5f)
             {
                 // Get paralyzed
-                if (isParalyzed) { return; } // If previous paralyzation already active, don't do anything
+                if (paralyzeCoroutine != null)
+                {
+                    StopCoroutine(paralyzeCoroutine);
+                }     // If previous paralyzation already active, don't do anything
                 paralyzeCoroutine = StartCoroutine(ParalyzeCor(GameManager.instance.playerCombatScript.explosionParalyzationSeconds)); // Start paralyzing the enemy
 
                 // Get knocked away from explosion
@@ -275,7 +283,13 @@ public class ProjectileEnemyController : MonoBehaviour
                 GameManager.instance.playerCombatScript.TakeDamage(2);
             }
         }
-
+        else if (collision.transform.CompareTag("LevelBorder"))
+        {
+            if (isParalyzed && (collision.relativeVelocity.sqrMagnitude >= sqrWallDamageMagnitudeLimit))
+            {
+                healthScript.TakeDamage(wallCollisionDamage);
+            }
+        }
         else if (collision.transform.CompareTag("PlayerShield"))
         {
             healthScript.TakeDamage(1);
@@ -293,6 +307,7 @@ public class ProjectileEnemyController : MonoBehaviour
         isPlayerShield = true;
         ManagePlayerShieldSpeedDamage(); // Just to make sure the color will be correct when first initializing
         playerShieldObject.SetActive(true); // Set the Player Shield sprite renderer object active
+        rigidBody.mass = 10;
         gameObject.tag = "PlayerShield"; // Change the tag so other enemies know what they are colliding with
         boxCollider.size = playerShieldObject.transform.localScale; // Set the collider to be as big as the Player Shield
     }

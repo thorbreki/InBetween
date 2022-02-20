@@ -1,0 +1,24 @@
+- Meira clear þegar playerinn meiðir sig
+- Skilur ekki af hverju hann þarf að sjá undir levelið
+- Coins ættu bara að vera eitthvað sem playerinn interactar við, samt interesting hugmynd
+- Veggur grípur player for sum reson
+- Likes this
+- Frekar lítið input, en finnst the complexity of the combat vera actually nógu flókið
+- Compound actions, eins og combatið er núna gæti það orðið soldið stale soldið fast.
+þannig að skjóta paralyzed enemy nokkrum sinnum með stamina shield ætti að láta hann fara enn hraðar.
+eða nota bombu og stamina shield til að skjóta tvöfalt hraðar
+
+- default zoom er of zoomed in
+
+- Breyta controls fyrir að skipta á milli ammo types, þannig að nota the mouse wheel til að skipta á milli ammo types.
+  Zoom in og out ekki hægt
+
+- Að enemies paralyzes-ast og skjótast strax í burtu (verða Player Shields) strax þegar þú hittir þá með Stamina Shield
+
+- Usually í skot tölvuleikjum, þá fokkast upp aimið hjá player þegar hann skítur mjög mikið mjög hratt.
+
+- Ekki mikill fan að byssan er með ekki endalaust ammo capacity með the pistol. Að upgrades hækka throughput af pistol
+  skotum og damage en byssan er alltaf með endalaus pistol shots.
+
+- Hann vill fara í a massive amount af hordes af enemies og sjá þá alla springa. Byrja að pæla í chain effects til að
+  vera a true agent of chaos.

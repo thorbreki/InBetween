@@ -25,6 +25,9 @@ public class RollerEnemyController : MonoBehaviour
     [Header("Paralyzed Attributes")]
     [SerializeField] private Color normalColor;
     [SerializeField] private Color paralyzedColor;
+    [SerializeField] private float wallDamageMagnitudeLimit;
+    [SerializeField] private float wallCollisionDamage;
+    private float sqrWallDamageMagnitudeLimit;
 
     [Header("Player Shield functionality")]
     [SerializeField] private GameObject playerShieldObject;
@@ -61,6 +64,7 @@ public class RollerEnemyController : MonoBehaviour
         // Initializing the movement values so they can be used
         movementForce = Random.Range(minMovementForce, maxMovementForce);
         movementSpeedLimit = Random.Range(minMovementSpeed, maxMovementSpeed);
+        sqrWallDamageMagnitudeLimit = wallDamageMagnitudeLimit * wallDamageMagnitudeLimit;
 
         attackPlayerVector = Vector2.zero; // Initialize the vector
     }
@@ -102,7 +106,13 @@ public class RollerEnemyController : MonoBehaviour
             attackPlayerCor = StartCoroutine(AttackPlayerCoroutine());
             return;
         }
-
+        else if (collision.transform.CompareTag("LevelBorder"))
+        {
+            if (isParalyzed && (collision.relativeVelocity.sqrMagnitude >= sqrWallDamageMagnitudeLimit))
+            {
+                healthScript.TakeDamage(wallCollisionDamage);
+            }
+        }
         // Colliding with a Player Shield
         else if (collision.transform.CompareTag("PlayerShield"))
         {
@@ -153,7 +163,10 @@ public class RollerEnemyController : MonoBehaviour
             if (distanceMultiplier >= 0.5f)
             {
                 // Get paralyzed
-                if (isParalyzed) { return; } // If previous paralyzation already active, don't do anything
+                if (paralyzeCoroutine != null)
+                {
+                    StopCoroutine(paralyzeCoroutine);
+                }     // If previous paralyzation already active, don't do anything
                 paralyzeCoroutine = StartCoroutine(ParalyzeCor(GameManager.instance.playerCombatScript.explosionParalyzationSeconds)); // Start paralyzing the enemy
 
                 // Get knocked away from explosion
@@ -198,6 +211,8 @@ public class RollerEnemyController : MonoBehaviour
     {
         yield return new WaitForSeconds(0.1f);
         isPlayerShield = true;
+        ManagePlayerShieldSpeedDamage();
+        rigidBody.mass = 10;
         playerShieldObject.SetActive(true); // Set the Player Shield sprite renderer object active
         gameObject.tag = "PlayerShield"; // Change the tag so other enemies know what they are colliding with
         circleCollider.radius = playerShieldObject.transform.localScale.x / 2; // Set the collider to be as big as the Player Shield
@@ -234,6 +249,7 @@ public class RollerEnemyController : MonoBehaviour
 
         // Take away Player Shield mode just in case
         playerShieldObject.SetActive(false);
+        rigidBody.mass = 1;
         isPlayerShield = false;
         gameObject.tag = "Enemy";
         circleCollider.radius = 0.5f;

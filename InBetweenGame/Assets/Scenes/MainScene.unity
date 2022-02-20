@@ -868,7 +868,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerTransform: {fileID: 1443807943}
   enemyKnockbackStaminaPenalty: 0.5
-  knockbackForce: 20
+  knockbackForce: 30
 --- !u!1 &732284211
 GameObject:
   m_ObjectHideFlags: 0
@@ -1061,7 +1061,7 @@ MonoBehaviour:
   diameter: 4
   movementSpeed: 10
   enemyKnockbackForce: 4
-  enemyParalyzationSeconds: 4
+  enemyParalyzationSeconds: 7
 --- !u!50 &757662796
 Rigidbody2D:
   serializedVersion: 4
@@ -1817,7 +1817,7 @@ GameObject:
   - component: {fileID: 1259534610}
   m_Layer: 0
   m_Name: LevelBorders
-  m_TagString: Untagged
+  m_TagString: LevelBorder
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -2065,8 +2065,8 @@ MonoBehaviour:
   minXSpawn: -24
   maxXSpawn: 24
   beginningSpawningCooldown: 10
-  spawningSpeedUp: 0.3
-  speedUpCoolDownSec: 20
+  spawningSpeedUp: 2
+  speedUpCoolDownSec: 10
 --- !u!1 &1369621477
 GameObject:
   m_ObjectHideFlags: 0
@@ -2224,7 +2224,7 @@ MonoBehaviour:
   staminaShieldObject: {fileID: 645458390}
   boxCollider: {fileID: 1443807945}
   movementSpeed: 6
-  jumpForce: 400
+  jumpForce: 1600
   jumpStaminaPenalty: 0.5
   maxStamina: 10
   staminaDepletionRate: 0.5
@@ -2269,7 +2269,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 4
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1.5
@@ -2307,7 +2307,7 @@ MonoBehaviour:
   explosionRadius: 5
   explosionTimeToLive: 1
   explosionParalyzationSeconds: 4
-  explosionMaxForce: 30
+  explosionMaxForce: 40
   maxHealth: 8
   healthBarController: {fileID: 257941218}
   coolDownSeconds: 0

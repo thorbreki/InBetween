@@ -10,7 +10,7 @@ public class ProjectileController : MonoBehaviour
     }
     private IEnumerator DeathCor()
     {
-        yield return new WaitForSeconds(20f);
+        yield return new WaitForSeconds(10f);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

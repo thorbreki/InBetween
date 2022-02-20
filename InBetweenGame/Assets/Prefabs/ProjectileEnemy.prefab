@@ -175,11 +175,13 @@ MonoBehaviour:
   velocityChangeSpeed: 0.5
   minProjectileSpeed: 6
   maxProjectileSpeed: 9
-  minProjectileCooldown: 0.5
-  maxProjectileCooldown: 4
+  minProjectileCooldown: 3
+  maxProjectileCooldown: 3
   shootingInaccuracy: 3
   normalColor: {r: 1, g: 0.3647059, b: 0.3647059, a: 1}
   paralyzedColor: {r: 0.5943396, g: 0.3504361, b: 0.3504361, a: 1}
+  wallDamageMagnitudeLimit: 8
+  wallCollisionDamage: 0.2
   playerShieldObject: {fileID: 6707255774807567814}
   playerShieldSpriteRenderer: {fileID: 7749343080796179283}
   playerShieldColor: {r: 0, g: 0.9960785, b: 0.9803922, a: 1}

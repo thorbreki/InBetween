@@ -40,7 +40,7 @@ public class EnemySpawnController : MonoBehaviour
         spawnPosition = new Vector3(0, spawnYLevel, transform.position.z);
         spawnCooldown = beginningSpawningCooldown;
         StartCoroutine(spawnEnemies()); // Start spawning enemies!
-        //StartCoroutine(IncreaseSpawningCooldown()); // Start speeding up!
+        StartCoroutine(IncreaseSpawningCooldown()); // Start speeding up!
     }
 
     private void Update()
@@ -98,10 +98,14 @@ public class EnemySpawnController : MonoBehaviour
     /// <returns></returns>
     private IEnumerator IncreaseSpawningCooldown()
     {
-        while (!Input.GetKey(KeyCode.Escape))
+        float divider = Mathf.Min(2, beginningSpawningCooldown);
+        float maxDividerValue = beginningSpawningCooldown;
+        while (true)
         {
             yield return new WaitForSeconds(speedUpCoolDownSec);
-            spawnCooldown -= spawningSpeedUp; // Actually speed up the spawner
+            spawnCooldown = beginningSpawningCooldown / divider; // Actually speed up the spawner
+            divider = Mathf.Min(maxDividerValue, divider + 0.4f);
+            print("SpawnCooldown:" + spawnCooldown.ToString());
         }
     }
 }

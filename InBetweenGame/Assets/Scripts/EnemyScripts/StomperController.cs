@@ -26,6 +26,9 @@ public class StomperController : MonoBehaviour
     [Header("Paralyzed Attributes")]
     [SerializeField] private Color normalColor;
     [SerializeField] private Color paralyzedColor;
+    [SerializeField] private float wallDamageMagnitudeLimit;
+    [SerializeField] private float wallCollisionDamage;
+    private float sqrWallDamageMagnitudeLimit;
 
     [Header("Player Shield functionality")]
     [SerializeField] private GameObject playerShieldObject;
@@ -72,6 +75,7 @@ public class StomperController : MonoBehaviour
         movementSpeed = Random.Range(minMovementSpeed, maxMovementSpeed);
         attackForce = Random.Range(minAttackForce, maxAttackForce);
         sqrDoubleDamageSpeedLimit = doubleDamageSpeedLimit * doubleDamageSpeedLimit;
+        sqrWallDamageMagnitudeLimit = wallDamageMagnitudeLimit * wallDamageMagnitudeLimit;
         attackVector = new Vector2(0, -attackForce);
 
         moveCor = StartCoroutine(MoveToDesiredPosCor());
@@ -201,7 +205,10 @@ public class StomperController : MonoBehaviour
             if (distanceMultiplier >= 0.5f)
             {
                 // Get paralyzed
-                if (isParalyzed) { return; } // If previous paralyzation already active, don't do anything
+                if (paralyzeCoroutine != null)
+                {
+                    StopCoroutine(paralyzeCoroutine);
+                }     // If previous paralyzation already active, don't do anything
                 paralyzeCoroutine = StartCoroutine(ParalyzeCor(GameManager.instance.playerCombatScript.explosionParalyzationSeconds)); // Start paralyzing the enemy
 
                 // Get knocked away from explosion
@@ -244,7 +251,13 @@ public class StomperController : MonoBehaviour
                 playerCombatScript.TakeDamage(2);
             }
         }
-
+        else if (collision.transform.CompareTag("LevelBorder"))
+        {
+            if (isParalyzed && (collision.relativeVelocity.sqrMagnitude >= sqrWallDamageMagnitudeLimit))
+            {
+                healthScript.TakeDamage(wallCollisionDamage);
+            }
+        }
         else if (collision.transform.CompareTag("PlayerShield"))
         {
             healthScript.TakeDamage(1);
@@ -270,6 +283,7 @@ public class StomperController : MonoBehaviour
 
         // Take away Player Shield mode just in case
         playerShieldObject.SetActive(false);
+        rigidBody.mass = 1;
         isPlayerShield = false;
         gameObject.tag = "Enemy";
         boxCollider.size = Vector2.one;
@@ -284,6 +298,7 @@ public class StomperController : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         isPlayerShield = true;
         ManagePlayerShieldSpeedDamage(); // Just to make sure the color will be correct when first initializing
+        rigidBody.mass = 10;
         playerShieldObject.SetActive(true); // Set the Player Shield sprite renderer object active
         gameObject.tag = "PlayerShield"; // Change the tag so other enemies know what they are colliding with
         boxCollider.size = playerShieldObject.transform.localScale; // Set the collider to be as big as the Player Shield

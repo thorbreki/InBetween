@@ -14,6 +14,11 @@ public class BasicEnemyController : MonoBehaviour
     [SerializeField] private Color normalColor;
     [SerializeField] private Color paralyzedColor;
 
+    [Header("Paralyzed Attributes")]
+    [SerializeField] private float wallDamageMagnitudeLimit;
+    [SerializeField] private float wallCollisionDamage;
+    private float sqrWallDamageMagnitudeLimit;
+
     [Header("Player Shield functionality")]
     [SerializeField] private GameObject playerShieldObject;
     [SerializeField] private SpriteRenderer playerShieldSpriteRenderer;
@@ -48,6 +53,7 @@ public class BasicEnemyController : MonoBehaviour
         playerTransform = GameManager.instance.playerTransform;
         movementSpeed = Random.Range(minMovementSpeed, maxMovementSpeed);
         sqrDoubleDamageSpeedLimit = doubleDamageSpeedLimit * doubleDamageSpeedLimit;
+        sqrWallDamageMagnitudeLimit = wallDamageMagnitudeLimit * wallDamageMagnitudeLimit;
 
 
         // Initialize vectors
@@ -124,7 +130,6 @@ public class BasicEnemyController : MonoBehaviour
         if (collider.CompareTag("Shield"))
         {
             OnShieldCollision(collider);
-            return;
         }
         else if (collider.name == "Bomb(Clone)") // Being caught in an explosion
         {
@@ -137,7 +142,10 @@ public class BasicEnemyController : MonoBehaviour
             if (distance <= (GameManager.instance.playerCombatScript.explosionRadius / 2f))
             {
                 // Get paralyzed
-                if (isParalyzed) { return; } // If previous paralyzation already active, don't do anything
+                if (paralyzeCoroutine != null)
+                {
+                    StopCoroutine(paralyzeCoroutine);
+                }     // If previous paralyzation already active, don't do anything
                 paralyzeCoroutine = StartCoroutine(ParalyzeCor(GameManager.instance.playerCombatScript.explosionParalyzationSeconds)); // Start paralyzing the enemy
 
                 // Get knocked away from explosion
@@ -182,6 +190,13 @@ public class BasicEnemyController : MonoBehaviour
                 Destroy(gameObject);
             }
         }
+        else if (collision.transform.CompareTag("LevelBorder"))
+        {
+            if (isParalyzed && (collision.relativeVelocity.sqrMagnitude >= sqrWallDamageMagnitudeLimit))
+            {
+                healthScript.TakeDamage(wallCollisionDamage);
+            }
+        }
         else if (collision.transform.CompareTag("PlayerShield"))
         {
             healthScript.TakeDamage(playerShieldDamage);
@@ -197,6 +212,7 @@ public class BasicEnemyController : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         isPlayerShield = true;
         ManagePlayerShieldSpeedDamage(); // Just to make sure the color will be correct when first initializing
+        rb.mass = 20;
         playerShieldObject.SetActive(true); // Set the Player Shield sprite renderer object active
         gameObject.tag = "PlayerShield"; // Change the tag so other enemies know what they are colliding with
         boxCollider.size = playerShieldObject.transform.localScale; // Set the collider to be as big as the Player Shield
@@ -237,6 +253,7 @@ public class BasicEnemyController : MonoBehaviour
 
         // Take away Player Shield mode just in case
         playerShieldObject.SetActive(false);
+        rb.mass = 1;
         isPlayerShield = false;
         gameObject.tag = "Enemy";
         boxCollider.size = Vector2.one;

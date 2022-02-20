@@ -21,7 +21,7 @@ public class EnemyHealthController : MonoBehaviour
 
     private Vector3 damageIndicatorPosition;
 
-    private int health;
+    private float health;
     private Coroutine showDamageCoroutine;
 
     private void Start()
@@ -41,7 +41,7 @@ public class EnemyHealthController : MonoBehaviour
         damageIndicatorPosition.x = transform.position.x; damageIndicatorPosition.y = transform.position.y + 1;
         damageIndicatorObject.transform.position = damageIndicatorPosition;
     }
-    public void TakeDamage(int amount)
+    public void TakeDamage(float amount)
     {
         health -= amount;
 
@@ -77,7 +77,7 @@ public class EnemyHealthController : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private IEnumerator ShowDamageCor(int amount)
+    private IEnumerator ShowDamageCor(float amount)
     {
         damageIndicatorText.text = "-" + amount.ToString();
         damageIndicatorObject.SetActive(true);
