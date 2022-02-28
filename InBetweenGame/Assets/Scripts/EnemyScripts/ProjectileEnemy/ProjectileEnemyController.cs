@@ -2,19 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ProjectileEnemyController : MonoBehaviour
+public class ProjectileEnemyController : ParentEnemyController
 {
+    [Header("PROJECTILE ENEMY")]
+
     [Header("Components and Objects")]
-    [SerializeField] private EnemyHealthController healthScript;
-    [SerializeField] private Rigidbody2D rigidBody; // The rigidbody component of the enemy
     [SerializeField] private GameObject projectileObject; // The projectile game object
-    [SerializeField] private SpriteRenderer spriteRenderer; // The sprite renderer component
 
     [Header("Movement Attributes")]
     [SerializeField] private float minDistance; // The lower bound of the random distance the enemy wants to keep from the player
     [SerializeField] private float maxDistance; // The higher bound (EXCLUSIVE IN THE RANDOM FUNCTION)
     [SerializeField] private float movementSpeed; // The enemy's movementSpeed
     [SerializeField] private float velocityChangeSpeed; // How fast the enemy can change its course
+    private float targetDistanceFromGround;
+    private float targetXDistanceFromPlayer;
 
     [Header("Attack Attributes")]
     [SerializeField] private float minProjectileSpeed; // the min possible speed of the projectiles
@@ -23,38 +24,10 @@ public class ProjectileEnemyController : MonoBehaviour
     [SerializeField] private float maxProjectileCooldown; // the max possible time between shooting (in seconds)
     [SerializeField] private float shootingInaccuracy; // How inaccurate the player's shooting is
 
-    [Header("Paralyzed Attributes")]
-    [SerializeField] private Color normalColor;
-    [SerializeField] private Color paralyzedColor;
-    [SerializeField] private float wallDamageMagnitudeLimit;
-    [SerializeField] private float wallCollisionDamage;
-    private float sqrWallDamageMagnitudeLimit;
-
-    [Header("Player Shield functionality")]
-    [SerializeField] private GameObject playerShieldObject;
-    [SerializeField] private SpriteRenderer playerShieldSpriteRenderer;
-    [SerializeField] private Color playerShieldColor; // Player Shield 1 color
-    [SerializeField] private Color playerShield2Color; // Player Shield 2 color
-    [SerializeField] private BoxCollider2D boxCollider;
-    [SerializeField] private int playerShieldDamage;
-    [SerializeField] private float doubleDamageSpeedLimit;
-    private float sqrDoubleDamageSpeedLimit;
-    private Coroutine playerShieldModeCoroutine;
-    private bool isPlayerShield = false; // To let other parts of the code know that the enemy is currently a Player Shield 
-
     private float projectileSpeed; // The speed of the projectiles this enemy shoots
     private float projectileCooldown; // The seconds between the enemy can shoot projectiles
     private int targetSideOfPlayer; // The enemy will always want to be either side of the player. 0 = left of player, 1 = right of player
 
-    public Transform playerTransform;
-    private float targetDistanceFromGround;
-    private float targetXDistanceFromPlayer;
-
-    // SHIELD FUNCTIONALITY
-    private ShieldController shieldControllerScript; // The shield's controller script to know important info
-    private bool isParalyzed = false;
-    private Coroutine paralyzeCoroutine; // Coroutine object for when the enemy gets paralyzed by the shield
-    private Vector2 knockBackVector; // The vector that knocks the enemy back
     private Vector2 currVelocity; // The vector to store the current movement velocity the Enemy has
 
     private Vector2 toPlayerVector; // The vector which defines where the enemy
@@ -63,11 +36,9 @@ public class ProjectileEnemyController : MonoBehaviour
     private Coroutine shootPlayerCoroutine; // Coroutine object for shooting the player
 
 
-    private void Start()
+    protected override void Start()
     {
-        // Initialize objects and components
-        playerShieldObject.SetActive(false);
-        boxCollider.size = new Vector2(1, 1);
+        base.Start();
 
         targetDistanceFromGround = Random.Range(minDistance, maxDistance); // Make the enemy randomly far from the floor
         targetXDistanceFromPlayer = Random.Range(minDistance, maxDistance); // Make the enemy randomly far from the player on the x coordinate
@@ -76,25 +47,14 @@ public class ProjectileEnemyController : MonoBehaviour
         projectileCooldown = Random.Range(minProjectileCooldown, maxProjectileCooldown); // Initializing how fast the enemy can shoot
 
         targetSideOfPlayer = Random.Range(0, 2);
-        sqrDoubleDamageSpeedLimit = doubleDamageSpeedLimit * doubleDamageSpeedLimit;
-        sqrWallDamageMagnitudeLimit = wallDamageMagnitudeLimit * wallDamageMagnitudeLimit;
 
         // Initialize the vectors so they can be used
         toPlayerVector = Vector2.zero;
         currVelocity = Vector2.zero;
-        knockBackVector = Vector2.zero;
 
         // Start functionality coroutines
         movementCoroutine = StartCoroutine(MoveTowardsPlayer());
         shootPlayerCoroutine = StartCoroutine(ShootPlayerCor());
-    }
-
-    private void Update()
-    {
-        if (isPlayerShield)
-        {
-            ManagePlayerShieldSpeedDamage();
-        }
     }
 
     /// <summary>
@@ -179,23 +139,7 @@ public class ProjectileEnemyController : MonoBehaviour
         }
     }
 
-
-    /// <summary>
-    /// Basic Enemy gets knocked back and paralyzed when hit with the shield
-    /// </summary>
-    /// <param name="collision"></param>
-    private void OnShieldCollision(Collider2D collider)
-    {
-        if (shieldControllerScript == null) { shieldControllerScript = collider.gameObject.GetComponent<ShieldController>(); } // Get the shield controller script if not already
-
-        if (isParalyzed) { return; } // Stop previous paralyzation if it is currently active
-        paralyzeCoroutine = StartCoroutine(ParalyzeCor(shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
-
-        // Call the playercombat script through the shield object to make the player lose the correct amount of energy
-        shieldControllerScript.playerCombatScript.OnShieldProtect();
-    }
-
-    private IEnumerator ParalyzeCor(float secondsOfParalyzation)
+    protected override IEnumerator ParalyzeCor(float secondsOfParalyzation)
     {
         isParalyzed = true;
         // Make sure all shooting is stopped
@@ -217,119 +161,5 @@ public class ProjectileEnemyController : MonoBehaviour
         movementCoroutine = StartCoroutine(MoveTowardsPlayer()); // Movement again!
         shootPlayerCoroutine = StartCoroutine(ShootPlayerCor()); // Start shooting again
         isParalyzed = false; // No longer paralyzed
-    }
-
-    private void OnTriggerEnter2D(Collider2D collider)
-    {
-        if (collider.CompareTag("Shield"))
-        {
-            OnShieldCollision(collider);
-        }
-
-        else if (collider.name == "Bomb(Clone)") // Being caught in an explosion
-        {
-            healthScript.TakeDamage(2); // Take damage
-            float distance = Vector2.Distance(transform.position, collider.transform.position);
-            float distanceMultiplier = Mathf.Max(1 - (distance / GameManager.instance.playerCombatScript.explosionRadius), 0f); // The farther the enemy is from explosion, less force
-            print("distanceMultiplier: " + distanceMultiplier);
-
-            // If the enemy is within the nearer half of the explosion: 2 damage, get paralyzed and Player Shield activate!
-            if (distanceMultiplier >= 0.5f)
-            {
-                // Get paralyzed
-                if (paralyzeCoroutine != null)
-                {
-                    StopCoroutine(paralyzeCoroutine);
-                }     // If previous paralyzation already active, don't do anything
-                paralyzeCoroutine = StartCoroutine(ParalyzeCor(GameManager.instance.playerCombatScript.explosionParalyzationSeconds)); // Start paralyzing the enemy
-
-                // Get knocked away from explosion
-                rigidBody.velocity = Vector2.zero; // To make sure the enemy gets knocked away from the explosion always the same amount of force no matter what
-                rigidBody.AddForce(distanceMultiplier * (GameManager.instance.playerCombatScript.explosionMaxForce * (transform.position - collider.transform.position).normalized), ForceMode2D.Impulse);
-
-                StartCoroutine(PlayerShieldModeCor()); // Then, go into Player Shield mode
-            }
-            else
-            {
-                // Get knocked away from explosion
-                rigidBody.velocity = Vector2.zero; // To make sure the enemy gets knocked away from the explosion always the same amount of force no matter what
-                rigidBody.AddForce(distanceMultiplier * (GameManager.instance.playerCombatScript.explosionMaxForce * (transform.position - collider.transform.position).normalized), ForceMode2D.Impulse);
-            }
-
-            // NOTICE: The reason why there are two rb.AddForce lines instead of just one, is because this ensures that the enemy is paralyzed before being
-            // pushed away from the bomb if it is close enough, so it will always go as fast it is supposed to. That would not be ensured if I would start
-            // pushin the enemy away before paralyzing it
-        }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.transform.CompareTag("Player"))
-        {
-            if (GameManager.instance.playerMovementScript.isRunning)
-            {
-                knockBackVector = transform.position - playerTransform.position;
-                healthScript.TakeDamage(1);
-                rigidBody.AddForce(knockBackVector.normalized * GameManager.instance.staminaShieldControllerScript.knockbackForce, ForceMode2D.Impulse);
-                
-                if (isParalyzed)
-                {
-                    StartCoroutine(PlayerShieldModeCor());
-                }
-                GameManager.instance.playerMovementScript.OnStaminaShieldProtect();
-            }
-            else if (!isParalyzed) // Player does not have stamina shield active so hurt him!
-            {
-                GameManager.instance.playerCombatScript.TakeDamage(2);
-            }
-        }
-        else if (collision.transform.CompareTag("LevelBorder"))
-        {
-            if (isParalyzed && (collision.relativeVelocity.sqrMagnitude >= sqrWallDamageMagnitudeLimit))
-            {
-                healthScript.TakeDamage(wallCollisionDamage);
-            }
-        }
-        else if (collision.transform.CompareTag("PlayerShield"))
-        {
-            healthScript.TakeDamage(1);
-        }
-        else if (collision.transform.CompareTag("PlayerShield2"))
-        {
-            healthScript.TakeDamage(playerShieldDamage * 2);
-        }
-    }
-
-
-    private IEnumerator PlayerShieldModeCor()
-    {
-        yield return new WaitForSeconds(0.1f);
-        isPlayerShield = true;
-        ManagePlayerShieldSpeedDamage(); // Just to make sure the color will be correct when first initializing
-        playerShieldObject.SetActive(true); // Set the Player Shield sprite renderer object active
-        rigidBody.mass = 10;
-        gameObject.tag = "PlayerShield"; // Change the tag so other enemies know what they are colliding with
-        boxCollider.size = playerShieldObject.transform.localScale; // Set the collider to be as big as the Player Shield
-    }
-
-    private void ManagePlayerShieldSpeedDamage()
-    {
-        if (rigidBody.velocity.sqrMagnitude < sqrDoubleDamageSpeedLimit)
-        {
-            if (!gameObject.CompareTag("PlayerShield")) { gameObject.tag = "PlayerShield"; } // Change tag so other enemies know the correct tag
-            playerShieldSpriteRenderer.color = playerShieldColor; // Set the color
-        }
-        else
-        {
-            if (!gameObject.CompareTag("PlayerShield2")) { gameObject.tag = "PlayerShield2"; } // Change tag so other enemies know the correct tag
-            playerShieldSpriteRenderer.color = playerShield2Color; // Set the color
-        }
-    }
-
-
-    private void OnDestroy()
-    {
-        StopAllCoroutines();
-        //Destroy(gameObject);
     }
 }

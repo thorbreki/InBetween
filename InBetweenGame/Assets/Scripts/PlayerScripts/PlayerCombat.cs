@@ -206,9 +206,12 @@ public class PlayerCombat : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Projectile") && !playerMovementScript.isRunning)
+        if (collision.CompareTag("Projectile"))
         {
-            TakeDamage(1);
+            if (!playerMovementScript.isRunning)
+                TakeDamage(1);
+            else
+                GameManager.instance.playerMovementScript.OnStaminaShieldProtect();
         }
     }
 

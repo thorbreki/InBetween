@@ -68,18 +68,12 @@ public class EnemySpawnController : MonoBehaviour
                     break;
                 case 2:
                     newEnemy = SpawnEnemy(projectileEnemyObject);
-                    newEnemy.GetComponent<ProjectileEnemyController>().SetPlayerTransform(playerTransform);
                     break;
                 case 3:
                     newEnemy = SpawnEnemy(stomperEnemyObject);
-                    StomperController stomperScript = newEnemy.GetComponent<StomperController>();
-                    stomperScript.playerTransform = playerTransform;
-                    stomperScript.playerCombatScript = playerCombatScript;
                     break;
                 default: // When the value is 4
                     newEnemy = SpawnEnemy(rollerEnemyObject);
-                    RollerEnemyController rollerScript = newEnemy.GetComponent<RollerEnemyController>();
-                    rollerScript.playerTransform = playerTransform;
                     break;
             }
             yield return new WaitForSeconds(spawnCooldown);
