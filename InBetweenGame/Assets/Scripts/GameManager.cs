@@ -21,7 +21,6 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         instance = this;
-        Application.targetFrameRate = 60;
         gameRunningUI.SetActive(true); // Making sure
         gameOverUI.SetActive(false); // Making sure
 
