@@ -17,9 +17,10 @@ public class LevelSceneController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI levelsText; // Text that just says "Levels"
     [SerializeField] private TextMeshProUGUI welcomeText; // Text that bids the player welcome
     [SerializeField] private TextMeshProUGUI levelStatisticsText; // Text that shows statistics of the level
+    [SerializeField] private Button playLevelButton; // Button to play the level
 
     [Header("Scene Level Attributes")]
-    [SerializeField] private float sceneFadeInSpeed;
+    public float sceneFadeInSpeed;
     [SerializeField] private float textFadeInSpeed;
     [SerializeField] private float cameraMovementSpeed;
 
@@ -37,6 +38,8 @@ public class LevelSceneController : MonoBehaviour
         amountText.alpha = 0f;
         levelsText.alpha = 0f;
         welcomeText.alpha = 0f;
+        levelStatisticsText.alpha = 0f;
+        playLevelButton.gameObject.SetActive(false);
 
         cameraPosition = cameraTransform.position;
 
@@ -83,6 +86,7 @@ public class LevelSceneController : MonoBehaviour
     public void GoThroughLevelScene()
     {
         CenterOnCurrentLevel();
+        InitializeTexts();
         StartCoroutine(FadeInLevelScene()); // START BY FADING IN THE LEVEL SCENE
         // IF PLAYER BEAT A LEVEL:
             // DISPLAY LEVEL X WON TEXT, THEN FADE OUT TEXT
@@ -92,6 +96,22 @@ public class LevelSceneController : MonoBehaviour
 
         // FADE OUT
         // CHANGE SCENE TO MAINSCENE
+    }
+
+    /// <summary>
+    /// Initializes all the texts to show correct strings before fading into existence
+    /// </summary>
+    private void InitializeTexts()
+    {
+        // GOOD JOB TEXT / BETTER LUCK NEXT TIME TEXT
+        goodJobText.text = ApplicationManager.instance.finishedLevelStatus == ApplicationManager.LevelFinishedStatus.Win ? "You won! Good job!" : "Better luck next time!";
+
+        // GO AHEAD TEXT / GO BACK TEXT
+        goAheadText.text = ApplicationManager.instance.finishedLevelStatus == ApplicationManager.LevelFinishedStatus.Win ? "You get to go ahead:" : "You must go back:";
+
+        // LEVELSTATISTICS TEXT
+        // TODO: WHEN YOU HAVE FINISHED CALCULATING THE RANDOM AMOUNT OF LEVELS TO GO FORWARD OR BACK YOU RETURN HERE TO SET THE LEVELSTATISTICSTEXT IN THIS METHOD
+        // BEFORE FADING IT IN
     }
 
     /// <summary>
@@ -148,30 +168,12 @@ public class LevelSceneController : MonoBehaviour
 
         // FADING IN THE WELCOME TEXT
         welcomeText.text = "Welcome!\nYou are on level " + ApplicationManager.instance.playerData.currentLevel.ToString();
-        float t = 0;
-
-        while (t < 1f)
-        {
-            welcomeText.alpha = t;
-            t += textFadeInSpeed * Time.deltaTime;
-            yield return null;
-        }
-        welcomeText.alpha = 1f;
+        StartCoroutine(FadeText(welcomeText, 0f, 1f));
 
         yield return new WaitForSeconds(1.5f);
 
         // FADING OUT THE WELCOME TEXT
-        t = 1f;
-
-        while (t > 0f)
-        {
-            welcomeText.alpha = t;
-            t -= textFadeInSpeed * Time.deltaTime;
-            yield return null;
-        }
-        welcomeText.alpha = 0f;
-
-        StartCoroutine(FadeOutLevelScene());
+        StartCoroutine(FadeText(welcomeText, 1f, 0f, FadeInLevelStatisticsText()));
     }
 
     /// <summary>
@@ -179,34 +181,14 @@ public class LevelSceneController : MonoBehaviour
     /// </summary>
     private IEnumerator FadeInGoodJobText()
     {
-        yield return new WaitForSeconds(0.3f);
-        float t = 0;
-
-        while (t < 1f)
-        {
-            goodJobText.alpha = t;
-            t += textFadeInSpeed * Time.deltaTime;
-            yield return null;
-        }
-        goodJobText.alpha = 1f;
-
-        StartCoroutine(FadeInGoAheadText());
+        yield return null;
+        StartCoroutine(FadeText(goodJobText, 0f, 1f, FadeInGoAheadText()));
     }
 
     private IEnumerator FadeInGoAheadText()
     {
-        yield return new WaitForSeconds(0.3f);
-        float t = 0;
-
-        while (t < 1f)
-        {
-            goAheadText.alpha = t;
-            t += textFadeInSpeed * Time.deltaTime;
-            yield return null;
-        }
-        goAheadText.alpha = 1f;
-
-        StartCoroutine(FadeInAndHandleAmountText());
+        yield return null;
+        StartCoroutine(FadeText(goAheadText, 0f, 1f, FadeInAndHandleAmountText()));
     }
 
     private IEnumerator FadeInAndHandleAmountText()
@@ -216,16 +198,7 @@ public class LevelSceneController : MonoBehaviour
         amountText.text = levelJump.ToString();
 
         // FADE IN AND HANDLE AMOUNT TEXT
-        yield return new WaitForSeconds(0.3f);
-        float t = 0;
-
-        while (t < 1f)
-        {
-            amountText.alpha = t;
-            t += textFadeInSpeed * Time.deltaTime;
-            yield return null;
-        }
-        amountText.alpha = 1f;
+        StartCoroutine(FadeText(amountText, 0f, 1f));
 
         // HANDLE THE LEVELJUMP TEXT UNTIL YOU GET ANOTHER NUMBER THAN 6
         bool loopEntered = false;
@@ -244,7 +217,10 @@ public class LevelSceneController : MonoBehaviour
             amountText.text = amountText.text + " = " + sum.ToString();
         }
 
-        ApplicationManager.instance.playerData.currentLevel += sum; // Update the currentLevel stored on disk
+        // Update the currentLevel stored on disk
+        ApplicationManager.instance.playerData.currentLevel += ApplicationManager.instance.finishedLevelStatus == ApplicationManager.LevelFinishedStatus.Win ? sum : -sum;
+        ApplicationManager.instance.playerData.currentLevel = Mathf.Min(ApplicationManager.instance.playerData.currentLevel, 100); // TODO: FIND SOME WAY TO ACCESS CONST IN GENERATOR
+        ApplicationManager.instance.playerData.currentLevel = Mathf.Max(ApplicationManager.instance.playerData.currentLevel, 1);
 
         StartCoroutine(FadeInLevelsText());
     }
@@ -252,17 +228,7 @@ public class LevelSceneController : MonoBehaviour
     private IEnumerator FadeInLevelsText()
     {
         yield return new WaitForSeconds(0.3f);
-        float t = 0;
-
-        while (t < 1f)
-        {
-            levelsText.alpha = t;
-            t += textFadeInSpeed * Time.deltaTime;
-            yield return null;
-        }
-        levelsText.alpha = 1f;
-
-        StartCoroutine(LerpCameraToCurrentLevel());
+        StartCoroutine(FadeText(levelsText, 0f, 1f, LerpCameraToCurrentLevel()));
     }
 
     private IEnumerator LerpCameraToCurrentLevel()
@@ -281,45 +247,102 @@ public class LevelSceneController : MonoBehaviour
         }
         cameraPosition.y = targetY;
         cameraTransform.position = cameraPosition;
+        StartCoroutine(FadeOutAllGoodJobTexts());
+    }
+
+    private IEnumerator FadeOutAllGoodJobTexts()
+    {
+        yield return new WaitForSeconds(0.3f);
+        float t = 1f;
+
+        while (t > 0f)
+        {
+            goodJobText.alpha = t;
+            goAheadText.alpha = t;
+            amountText.alpha = t;
+            levelsText.alpha = t;
+            t -= textFadeInSpeed * Time.deltaTime;
+            yield return null;
+        }
+        goodJobText.alpha = 0f;
+        goAheadText.alpha = 0f;
+        amountText.alpha = 0f;
+        levelsText.alpha = 0f;
+
+        StartCoroutine(FadeInLevelStatisticsText());
     }
 
 
     private IEnumerator FadeInLevelStatisticsText()
     {
         yield return new WaitForSeconds(0.3f);
-        float t = 0;
+        int currLevelIndex = ApplicationManager.instance.playerData.currentLevel;
+        int prevLevelIndex = ApplicationManager.instance.playerData.prevLevel;
+        LevelData currLevel = levelsGenerator.levelDataArray.arrayOfLevelData[currLevelIndex-1];
+        LevelData prevLevel = levelsGenerator.levelDataArray.arrayOfLevelData[prevLevelIndex-1];
 
-        while (t < 1f)
+        levelStatisticsText.text = "";
+        
+        // ADD TO THE LEVELSTATISTICSTEXT THE LEVEL ATTRIBUTES THAT HAVE GOTTEN TOUGHER
+        if (currLevel.totalAmountOfEnemies > prevLevel.totalAmountOfEnemies)
         {
-            levelsText.alpha = t;
-            t += textFadeInSpeed * Time.deltaTime;
-            yield return null;
+            levelStatisticsText.text += "+ Amount of Enemies";
+        } if (currLevel.enemyDamageBoost > prevLevel.enemyDamageBoost)
+        {
+            levelStatisticsText.text += "\n+ Enemy Damage";
+        } if (currLevel.enemyHealthBoost > prevLevel.enemyHealthBoost)
+        {
+            levelStatisticsText.text += "\n+ Enemy Health";
+        } if (currLevel.enemySpeedBoost > prevLevel.enemySpeedBoost)
+        {
+            levelStatisticsText.text += "\n+ Enemy Speed";
+        } if (currLevel.secondsToSpawn < prevLevel.secondsToSpawn)
+        {
+            levelStatisticsText.text += "\n+ Spawn Rate";
+        } if (currLevel.numOfMaxActiveEnemies > prevLevel.numOfMaxActiveEnemies)
+        {
+            levelStatisticsText.text += "\n+ Number of Active Enemies";
         }
-        levelsText.alpha = 1f;
 
-        StartCoroutine(LerpCameraToCurrentLevel());
+        StartCoroutine(FadeText(levelStatisticsText, 0f, 1f));
+        yield return new WaitForSeconds(0.5f);
+        playLevelButton.gameObject.SetActive(true);
     }
 
-    /// <summary>
-    /// Slowly fade out the Level Scene by increasing the alpha of the overlay to 1
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator FadeOutLevelScene()
-    {
-        yield return new WaitForSeconds(0.5f);
-        Color overlayColor = canvasOverlayImage.color;
-        float initial = 1f;
-        float target = 0f;
-        float t = 1;
 
-        while (t > 0)
+    /// <summary>
+    ///  A general coroutine for lerping the alpha value of the color of a text
+    /// </summary>
+    /// <param name="text">The input text</param>
+    /// <param name="start">The start value of t</param>
+    /// <param name="end">The target value of t</param>
+    /// <param name="inputCoroutine">The next coroutine that will be started after this one</param>
+    /// <returns>Your mom</returns>
+    private IEnumerator FadeText(TextMeshProUGUI text, float start, float end, IEnumerator inputCoroutine = null)
+    {
+        yield return new WaitForSeconds(0.3f);
+        float t = start;
+
+        if (start < end)
         {
-            overlayColor.a = (initial * t) + (target * (1 - t));
-            canvasOverlayImage.color = overlayColor;
-            t -= sceneFadeInSpeed * Time.deltaTime;
-            yield return null;
+            while (t < end)
+            {
+                text.alpha = t;
+                t += textFadeInSpeed * Time.deltaTime;
+                yield return null;
+            }
         }
-        overlayColor.a = 0;
-        canvasOverlayImage.color = overlayColor;
+        else if (start > end)
+        {
+            while (t > end)
+            {
+                text.alpha = t;
+                t -= textFadeInSpeed * Time.deltaTime;
+                yield return null;
+            }
+        }
+        text.alpha = end;
+
+        if (inputCoroutine != null) { StartCoroutine(inputCoroutine); }
     }
 }

@@ -10,7 +10,7 @@ public class LevelsGenerator : MonoBehaviour
     [SerializeField] private Transform specialLevelNumbersParentObject;
 
     // CONSTANTS
-    private const int AMOUNT_OF_LEVELS = 100;
+    [HideInInspector] public const int AMOUNT_OF_LEVELS = 100;
     private const int DISTANCE_BETWEEN_LEVELS = 4;
     private const string DIR_NAME = "Levels";
     private const string FILE_NAME = "levels.binary";
@@ -41,6 +41,10 @@ public class LevelsGenerator : MonoBehaviour
         if (!Directory.Exists(DIR_NAME))
         {
             Directory.CreateDirectory(DIR_NAME);
+        }
+
+        if (!File.Exists(DIR_NAME + "/" + FILE_NAME)) // If the file has never been created before
+        {
             GenerateAndSaveLevelsData();
         } else
         {
@@ -62,7 +66,7 @@ public class LevelsGenerator : MonoBehaviour
     private void GenerateAndSaveLevelsData()
     {
         print("Generating and saving the level data!");
-        ArrayOfLevelData levelDataArray = new ArrayOfLevelData();
+        levelDataArray = new ArrayOfLevelData();
         levelDataArray.arrayOfLevelData = new LevelData[AMOUNT_OF_LEVELS];
 
         // GENERATE ALL THE DATA TO SERIALIZE INTO THE BINARY FILE
@@ -70,7 +74,7 @@ public class LevelsGenerator : MonoBehaviour
         {
             /* -- CREATE NEW INSTANCES OF LEVELDATA CLASS AND ADD THEM TO THE LEVELDATAARRAY CLASS -- */
             LevelData currLevelData = new LevelData();
-            currLevelData.totalAmountOfEnemies = i * 2;
+            currLevelData.totalAmountOfEnemies = (i+1) * 2;
             currLevelData.secondsToSpawn = 20f / (i + 1);
             currLevelData.enemyDamageBoost = ApplicationManager.instance.playerData.currentLevel > 50 ? 1 : 0; // When player has gotten to over level 50, enemies/projectiles to 1 more damge
             currLevelData.enemySpeedBoost = 0f;

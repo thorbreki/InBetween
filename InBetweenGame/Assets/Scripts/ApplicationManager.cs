@@ -6,7 +6,7 @@ public class ApplicationManager : MonoBehaviour
 {
     public static ApplicationManager instance;
 
-    public PlayerData playerData;
+    [HideInInspector] public PlayerData playerData;
 
     public enum LevelFinishedStatus
     {
@@ -16,7 +16,7 @@ public class ApplicationManager : MonoBehaviour
     }
 
     // This enum shows whether or not the player finished a level before arriving in the Level Scene, and shows wether the player lost or won
-    [HideInInspector] public LevelFinishedStatus finishedLevelStatus = LevelFinishedStatus.No;
+    [HideInInspector] public LevelFinishedStatus finishedLevelStatus = LevelFinishedStatus.Win;
     
     private void Awake()
     {
@@ -24,7 +24,7 @@ public class ApplicationManager : MonoBehaviour
         Application.targetFrameRate = 60;
 
         // TODO: REMOVE THIS LINE WHEN DONE IMPLEMENTING BASIC LEVELS SCENE FUNCITONALITY
-        finishedLevelStatus = LevelFinishedStatus.No;
+        finishedLevelStatus = LevelFinishedStatus.Loss;
         print(finishedLevelStatus.ToString());
     }
 
@@ -32,6 +32,7 @@ public class ApplicationManager : MonoBehaviour
     {
         playerData = new PlayerData();
         playerData.currentLevel = 1;
+        playerData.prevLevel = 1;
         playerData.maxHealth = 8;
         playerData.pistolDamage = 1;
         playerData.bombDamage = 2;

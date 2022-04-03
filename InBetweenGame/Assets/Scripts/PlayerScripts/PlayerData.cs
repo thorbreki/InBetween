@@ -4,7 +4,8 @@ using System.Collections.Generic;
 [System.Serializable]
 public class PlayerData
 {
-    public int currentLevel;
+    public int currentLevel; // NOT ZERO INDEXED
+    public int prevLevel;
     public int maxHealth;
     public int pistolDamage;
     public int bombDamage;
