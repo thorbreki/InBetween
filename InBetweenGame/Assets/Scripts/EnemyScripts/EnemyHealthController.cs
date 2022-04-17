@@ -13,6 +13,7 @@ public class EnemyHealthController : MonoBehaviour
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private GameObject coinObject;
     [SerializeField] private GameObject damageIndicatorPrefab;
+    [SerializeField] private TextMeshPro numberOfEnemiesLeftText;
                      private TextMeshPro damageIndicatorText;
                      private GameObject damageIndicatorObject;
 
@@ -38,6 +39,7 @@ public class EnemyHealthController : MonoBehaviour
     private void Update()
     {
         // Position damage indicator respectively
+        if (damageIndicatorObject == null) { return; }
         damageIndicatorPosition.x = transform.position.x; damageIndicatorPosition.y = transform.position.y + 1;
         damageIndicatorObject.transform.position = damageIndicatorPosition;
     }
@@ -73,6 +75,9 @@ public class EnemyHealthController : MonoBehaviour
         // Spawn in the coin
         Instantiate(coinObject, transform.position, transform.rotation);
 
+        // Let Game Manager know I have died
+        GameManager.instance.OnEnemyDeath();
+
         // Die
         Destroy(gameObject);
     }
@@ -80,9 +85,10 @@ public class EnemyHealthController : MonoBehaviour
     private IEnumerator ShowDamageCor(float amount)
     {
         damageIndicatorText.text = "-" + amount.ToString();
-        damageIndicatorObject.SetActive(true);
+        if (damageIndicatorObject != null) { damageIndicatorObject.SetActive(true); }
         yield return new WaitForSeconds(0.3f);
-        damageIndicatorObject.SetActive(false);
+
+        if (damageIndicatorObject != null) { damageIndicatorObject.SetActive(false); }
     }
 
 

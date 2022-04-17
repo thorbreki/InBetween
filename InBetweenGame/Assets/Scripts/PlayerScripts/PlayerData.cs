@@ -14,4 +14,5 @@ public class PlayerData
     public float bombParalyzationSeconds;
     public int maxStamina;
     public int maxGunEnergy;
+    public ApplicationManager.LevelFinishedStatus levelFinishedStatus;
 }

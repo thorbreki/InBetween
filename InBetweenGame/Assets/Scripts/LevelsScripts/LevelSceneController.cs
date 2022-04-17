@@ -104,10 +104,10 @@ public class LevelSceneController : MonoBehaviour
     private void InitializeTexts()
     {
         // GOOD JOB TEXT / BETTER LUCK NEXT TIME TEXT
-        goodJobText.text = ApplicationManager.instance.finishedLevelStatus == ApplicationManager.LevelFinishedStatus.Win ? "You won! Good job!" : "Better luck next time!";
+        goodJobText.text = ApplicationManager.instance.playerData.levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win ? "You won! Good job!" : "Better luck next time!";
 
         // GO AHEAD TEXT / GO BACK TEXT
-        goAheadText.text = ApplicationManager.instance.finishedLevelStatus == ApplicationManager.LevelFinishedStatus.Win ? "You get to go ahead:" : "You must go back:";
+        goAheadText.text = ApplicationManager.instance.playerData.levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win ? "You get to go ahead:" : "You must go back:";
 
         // LEVELSTATISTICS TEXT
         // TODO: WHEN YOU HAVE FINISHED CALCULATING THE RANDOM AMOUNT OF LEVELS TO GO FORWARD OR BACK YOU RETURN HERE TO SET THE LEVELSTATISTICSTEXT IN THIS METHOD
@@ -146,9 +146,8 @@ public class LevelSceneController : MonoBehaviour
         overlayColor.a = 0;
         canvasOverlayImage.color = overlayColor;
 
-        print(ApplicationManager.instance.finishedLevelStatus);
         // KEEP ON GOING WITH THE PROCESS OF THE LEVELS SCENE
-        if (ApplicationManager.instance.finishedLevelStatus != ApplicationManager.LevelFinishedStatus.No)
+        if (ApplicationManager.instance.playerData.levelFinishedStatus != ApplicationManager.LevelFinishedStatus.No)
         {
             StartCoroutine(FadeInGoodJobText()); // Start fading in good job text if player finished a level
         }
@@ -218,9 +217,10 @@ public class LevelSceneController : MonoBehaviour
         }
 
         // Update the currentLevel stored on disk
-        ApplicationManager.instance.playerData.currentLevel += ApplicationManager.instance.finishedLevelStatus == ApplicationManager.LevelFinishedStatus.Win ? sum : -sum;
+        ApplicationManager.instance.playerData.currentLevel += ApplicationManager.instance.playerData.levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win ? sum : -sum;
         ApplicationManager.instance.playerData.currentLevel = Mathf.Min(ApplicationManager.instance.playerData.currentLevel, 100); // TODO: FIND SOME WAY TO ACCESS CONST IN GENERATOR
         ApplicationManager.instance.playerData.currentLevel = Mathf.Max(ApplicationManager.instance.playerData.currentLevel, 1);
+        ApplicationManager.instance.currLevelData = levelsGenerator.levelDataArray.arrayOfLevelData[ApplicationManager.instance.playerData.currentLevel - 1];
 
         StartCoroutine(FadeInLevelsText());
     }

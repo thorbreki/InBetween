@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class EnemySpawnController : MonoBehaviour
 {
@@ -19,6 +20,8 @@ public class EnemySpawnController : MonoBehaviour
     [SerializeField] private float maxXSpawn; // What is the maximum on the x-axis enemies can spawn
     [SerializeField] private float beginningSpawningCooldown; // How fast does the spawner spawn enemies in the beginning of survival mode
 
+    private int numOfEnemiesSpawned = 0;
+
     /// <summary>
     /// When the spawner speeds up, how much does it speed up
     /// </summary>
@@ -33,51 +36,47 @@ public class EnemySpawnController : MonoBehaviour
     private Vector3 spawnPosition;
     
     private Coroutine spawnEnemiesCoroutine;
+    private Coroutine decreaseSpawningCooldownCoroutine;
 
 
     private void Start()
     {
         spawnPosition = new Vector3(0, spawnYLevel, transform.position.z);
         spawnCooldown = beginningSpawningCooldown;
-        StartCoroutine(spawnEnemies()); // Start spawning enemies!
-        StartCoroutine(IncreaseSpawningCooldown()); // Start speeding up!
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.RightShift))
-        {
-            if (spawnEnemiesCoroutine != null) { return; }
-            spawnEnemiesCoroutine = StartCoroutine(spawnEnemies());
-            StartCoroutine(IncreaseSpawningCooldown()); // Start speeding up!
-        }
+        spawnEnemiesCoroutine = StartCoroutine(spawnEnemies()); // Start spawning enemies!
+        decreaseSpawningCooldownCoroutine = StartCoroutine(IncreaseSpawningCooldown()); // Start speeding up!
     }
 
     // A coroutine that spawns enemies
     private IEnumerator spawnEnemies()
     {
-        while (!Input.GetKey(KeyCode.Escape))
+        yield return new WaitForSeconds(2f);
+        int maxNumOfEnemies = GameManager.instance.numOfEnemiesLeft; // At this time, this variable will equal the actual variable which holds the max amount of enemies
+        while (numOfEnemiesSpawned < maxNumOfEnemies)
         {
+            numOfEnemiesSpawned++;
             int randomEnemyNumber = Random.Range(1, 5); // The number which will decide which enemy type gets spawned
-            GameObject newEnemy;
 
             switch (randomEnemyNumber)
             {
                 case 1:
-                    newEnemy = SpawnEnemy(basicEnemyObject);
+                    SpawnEnemy(basicEnemyObject);
                     break;
                 case 2:
-                    newEnemy = SpawnEnemy(projectileEnemyObject);
+                    SpawnEnemy(projectileEnemyObject);
                     break;
                 case 3:
-                    newEnemy = SpawnEnemy(stomperEnemyObject);
+                    SpawnEnemy(stomperEnemyObject);
                     break;
                 default: // When the value is 4
-                    newEnemy = SpawnEnemy(rollerEnemyObject);
+                    SpawnEnemy(rollerEnemyObject);
                     break;
             }
             yield return new WaitForSeconds(spawnCooldown);
         }
+
+        // THE PLAYER HAS MANAGED TO DEFEAT THE LEVEL
+        StopCoroutine(decreaseSpawningCooldownCoroutine);
     }
 
     private GameObject SpawnEnemy(GameObject newEnemyObject)
