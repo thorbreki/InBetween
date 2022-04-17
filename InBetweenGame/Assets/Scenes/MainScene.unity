@@ -540,7 +540,7 @@ GameObject:
   - component: {fileID: 350494055}
   - component: {fileID: 350494054}
   m_Layer: 5
-  m_Name: RestartButton
+  m_Name: ContinueButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -612,11 +612,11 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 812741002}
         m_TargetAssemblyTypeName: CanvasFunctions, Assembly-CSharp
-        m_MethodName: RestartGame
-        m_Mode: 1
+        m_MethodName: GoToLevelScene
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 2038588382}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.RawImage, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -1611,7 +1611,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gunModeText: {fileID: 1122779137}
-  gameWonOverlayImage: {fileID: 556251178}
 --- !u!1 &864204585
 GameObject:
   m_ObjectHideFlags: 0
@@ -3028,10 +3027,10 @@ MonoBehaviour:
       - m_Target: {fileID: 812741002}
         m_TargetAssemblyTypeName: CanvasFunctions, Assembly-CSharp
         m_MethodName: GoToLevelScene
-        m_Mode: 1
+        m_Mode: 2
         m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgument: {fileID: 556251178}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.RawImage, UnityEngine.UI
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -3385,7 +3384,7 @@ GameObject:
   - component: {fileID: 1975440867}
   - component: {fileID: 1975440866}
   m_Layer: 5
-  m_Name: RestartText
+  m_Name: ContinueText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3430,7 +3429,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Restart
+  m_text: Continue
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

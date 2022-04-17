@@ -8,7 +8,7 @@ public class ApplicationManager : MonoBehaviour
 {
     public static ApplicationManager instance;
 
-    [HideInInspector] public PlayerData playerData;
+    private PlayerData playerData;
     [HideInInspector] public LevelData currLevelData;
 
     private const string DIR_NAME = "Player";
@@ -37,7 +37,39 @@ public class ApplicationManager : MonoBehaviour
         // TODO: REMOVE THIS LINE WHEN DONE IMPLEMENTING BASIC LEVELS SCENE FUNCITONALITY
     }
 
-    public void InitializePlayerData()
+    public PlayerData GetPlayerData()
+    {
+        if (playerData == null)
+        {
+            if (!Directory.Exists(DIR_NAME))
+            {
+                Directory.CreateDirectory(DIR_NAME);
+            }
+
+            if (!File.Exists(DIR_NAME + "/" + FILE_NAME)) // If the file has never been created before
+            {
+                InitializePlayerData();
+                SavePlayerData();
+            }
+            else // The player data file is already created, so only need to load in the data
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                FileStream saveFile = File.Open(DIR_NAME + "/" + FILE_NAME, FileMode.Open);
+
+                playerData = (PlayerData)formatter.Deserialize(saveFile);
+
+                saveFile.Close();
+            }
+        }
+        return playerData;
+    }
+
+    public void SetPlayerData(PlayerData newPlayerData)
+    {
+        playerData = newPlayerData;
+    }
+
+    private void InitializePlayerData()
     {
         playerData = new PlayerData();
         playerData.currentLevel = 1;

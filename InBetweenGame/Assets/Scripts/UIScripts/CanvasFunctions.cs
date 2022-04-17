@@ -9,7 +9,6 @@ public class CanvasFunctions : MonoBehaviour
 {
     [Header("Gun Mode Text")]
     [SerializeField] private TextMeshProUGUI gunModeText;
-    [SerializeField] private RawImage gameWonOverlayImage;
 
     private Coroutine displayGunModeTextCoroutine;
 
@@ -31,28 +30,29 @@ public class CanvasFunctions : MonoBehaviour
     /// <summary>
     /// Fades out the Main Level and loads up the Level Scene
     /// </summary>
-    public void GoToLevelScene()
+    public void GoToLevelScene(RawImage inputRawImage)
     {
-        StartCoroutine(GoToLevelSceneCor());
+        StartCoroutine(GoToLevelSceneCor(inputRawImage));
     }
 
-    private IEnumerator GoToLevelSceneCor()
+    private IEnumerator GoToLevelSceneCor(RawImage inputRawImage)
     {
-        Color overlayColor = gameWonOverlayImage.color;
-        float initial = gameWonOverlayImage.color.a;
+        print("GOING TO LEVEL SCENE!");
+        Color overlayColor = inputRawImage.color;
+        float initial = inputRawImage.color.a;
+        print("INITIAL: " + initial.ToString());
         float target = 1f;
         float t = 0;
 
         while (t < 1f)
         {
             overlayColor.a = (initial * (1-t)) + (target * t);
-            gameWonOverlayImage.color = overlayColor;
+            inputRawImage.color = overlayColor;
             t += 0.5f * Time.deltaTime;
             yield return null;
         }
         overlayColor.a = 1f;
-        gameWonOverlayImage.color = overlayColor;
-
+        inputRawImage.color = overlayColor;
 
         SceneManager.LoadScene(0);
     }

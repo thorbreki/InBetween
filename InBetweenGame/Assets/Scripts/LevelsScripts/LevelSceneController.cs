@@ -42,41 +42,6 @@ public class LevelSceneController : MonoBehaviour
         playLevelButton.gameObject.SetActive(false);
 
         cameraPosition = cameraTransform.position;
-
-        InitializePlayerData(); // Whenever the game starts, the game retrieves all the data about the player it needs
-    }
-
-    private void InitializePlayerData()
-    {
-        if (!Directory.Exists(DIR_NAME))
-        {
-            Directory.CreateDirectory(DIR_NAME);
-        }
-
-        if (!File.Exists(DIR_NAME + "/" + FILE_NAME)) // If the file has never been created before
-        {
-            InitializePlayerFile();
-        }
-        else // The player data file is already created, so only need to load in the data
-        {
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream saveFile = File.Open(DIR_NAME + "/" + FILE_NAME, FileMode.Open);
-
-            ApplicationManager.instance.playerData = (PlayerData)formatter.Deserialize(saveFile);
-
-            saveFile.Close();
-        }
-    }
-
-    private void InitializePlayerFile()
-    {
-        ApplicationManager.instance.InitializePlayerData();
-
-        BinaryFormatter binaryFormatter = new BinaryFormatter();
-        FileStream saveFile = File.Create(DIR_NAME + "/" + FILE_NAME);
-        binaryFormatter.Serialize(saveFile, ApplicationManager.instance.playerData);
-
-        saveFile.Close();
     }
 
 
@@ -104,10 +69,10 @@ public class LevelSceneController : MonoBehaviour
     private void InitializeTexts()
     {
         // GOOD JOB TEXT / BETTER LUCK NEXT TIME TEXT
-        goodJobText.text = ApplicationManager.instance.playerData.levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win ? "You won! Good job!" : "Better luck next time!";
+        goodJobText.text = ApplicationManager.instance.GetPlayerData().levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win ? "You won! Good job!" : "Better luck next time!";
 
         // GO AHEAD TEXT / GO BACK TEXT
-        goAheadText.text = ApplicationManager.instance.playerData.levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win ? "You get to go ahead:" : "You must go back:";
+        goAheadText.text = ApplicationManager.instance.GetPlayerData().levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win ? "You get to go ahead:" : "You must go back:";
 
         // LEVELSTATISTICS TEXT
         // TODO: WHEN YOU HAVE FINISHED CALCULATING THE RANDOM AMOUNT OF LEVELS TO GO FORWARD OR BACK YOU RETURN HERE TO SET THE LEVELSTATISTICSTEXT IN THIS METHOD
@@ -120,7 +85,7 @@ public class LevelSceneController : MonoBehaviour
     private void CenterOnCurrentLevel()
     {
         cameraTransform.position = new Vector3(cameraTransform.position.x,
-            levelsGenerator.FindCorrectYPosition(ApplicationManager.instance.playerData.currentLevel - 1),
+            levelsGenerator.FindCorrectYPosition(ApplicationManager.instance.GetPlayerData().currentLevel - 1),
             cameraTransform.position.z);
     }
 
@@ -147,7 +112,7 @@ public class LevelSceneController : MonoBehaviour
         canvasOverlayImage.color = overlayColor;
 
         // KEEP ON GOING WITH THE PROCESS OF THE LEVELS SCENE
-        if (ApplicationManager.instance.playerData.levelFinishedStatus != ApplicationManager.LevelFinishedStatus.No)
+        if (ApplicationManager.instance.GetPlayerData().levelFinishedStatus != ApplicationManager.LevelFinishedStatus.No)
         {
             StartCoroutine(FadeInGoodJobText()); // Start fading in good job text if player finished a level
         }
@@ -166,7 +131,7 @@ public class LevelSceneController : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
 
         // FADING IN THE WELCOME TEXT
-        welcomeText.text = "Welcome!\nYou are on level " + ApplicationManager.instance.playerData.currentLevel.ToString();
+        welcomeText.text = "Welcome!\nYou are on level " + ApplicationManager.instance.GetPlayerData().currentLevel.ToString();
         StartCoroutine(FadeText(welcomeText, 0f, 1f));
 
         yield return new WaitForSeconds(1.5f);
@@ -217,10 +182,10 @@ public class LevelSceneController : MonoBehaviour
         }
 
         // Update the currentLevel stored on disk
-        ApplicationManager.instance.playerData.currentLevel += ApplicationManager.instance.playerData.levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win ? sum : -sum;
-        ApplicationManager.instance.playerData.currentLevel = Mathf.Min(ApplicationManager.instance.playerData.currentLevel, 100); // TODO: FIND SOME WAY TO ACCESS CONST IN GENERATOR
-        ApplicationManager.instance.playerData.currentLevel = Mathf.Max(ApplicationManager.instance.playerData.currentLevel, 1);
-        ApplicationManager.instance.currLevelData = levelsGenerator.levelDataArray.arrayOfLevelData[ApplicationManager.instance.playerData.currentLevel - 1];
+        ApplicationManager.instance.GetPlayerData().currentLevel += ApplicationManager.instance.GetPlayerData().levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win ? sum : -sum;
+        ApplicationManager.instance.GetPlayerData().currentLevel = Mathf.Min(ApplicationManager.instance.GetPlayerData().currentLevel, 100); // TODO: FIND SOME WAY TO ACCESS CONST IN GENERATOR
+        ApplicationManager.instance.GetPlayerData().currentLevel = Mathf.Max(ApplicationManager.instance.GetPlayerData().currentLevel, 1);
+        ApplicationManager.instance.currLevelData = levelsGenerator.levelDataArray.arrayOfLevelData[ApplicationManager.instance.GetPlayerData().currentLevel - 1];
 
         StartCoroutine(FadeInLevelsText());
     }
@@ -236,7 +201,7 @@ public class LevelSceneController : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
         float t = 0;
         float initialY = cameraTransform.position.y;
-        float targetY = levelsGenerator.FindCorrectYPosition(ApplicationManager.instance.playerData.currentLevel - 1);
+        float targetY = levelsGenerator.FindCorrectYPosition(ApplicationManager.instance.GetPlayerData().currentLevel - 1);
 
         while (t <= 1f)
         {
@@ -276,8 +241,8 @@ public class LevelSceneController : MonoBehaviour
     private IEnumerator FadeInLevelStatisticsText()
     {
         yield return new WaitForSeconds(0.3f);
-        int currLevelIndex = ApplicationManager.instance.playerData.currentLevel;
-        int prevLevelIndex = ApplicationManager.instance.playerData.prevLevel;
+        int currLevelIndex = ApplicationManager.instance.GetPlayerData().currentLevel;
+        int prevLevelIndex = ApplicationManager.instance.GetPlayerData().prevLevel;
         LevelData currLevel = levelsGenerator.levelDataArray.arrayOfLevelData[currLevelIndex-1];
         LevelData prevLevel = levelsGenerator.levelDataArray.arrayOfLevelData[prevLevelIndex-1];
 

@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
     /// <param name="newLevelStatus"></param>
     private void OnLevelFinish(ApplicationManager.LevelFinishedStatus newLevelStatus)
     {
-        ApplicationManager.instance.playerData.levelFinishedStatus = newLevelStatus;
+        ApplicationManager.instance.GetPlayerData().levelFinishedStatus = newLevelStatus;
         ApplicationManager.instance.SavePlayerData();
     }
 
@@ -55,8 +55,9 @@ public class GameManager : MonoBehaviour
     {
         gameRunningUI.SetActive(false);
         gameOverUI.SetActive(true);
-        Time.timeScale = 0f;
-        ApplicationManager.instance.finishedLevelStatus = ApplicationManager.LevelFinishedStatus.Loss;
+        PlayerData oldPlayerData = ApplicationManager.instance.GetPlayerData();
+        oldPlayerData.levelFinishedStatus = ApplicationManager.LevelFinishedStatus.Loss;
+        ApplicationManager.instance.SetPlayerData(oldPlayerData);
         OnLevelFinish(ApplicationManager.LevelFinishedStatus.Loss);
     }
 
@@ -87,8 +88,9 @@ public class GameManager : MonoBehaviour
     {
         gameRunningUI.SetActive(false);
         gameWonUI.SetActive(true);
-        ApplicationManager.instance.finishedLevelStatus = ApplicationManager.LevelFinishedStatus.Win;
-        print("Hold UP: " + ApplicationManager.instance.finishedLevelStatus.ToString());
+        PlayerData oldPlayerData = ApplicationManager.instance.GetPlayerData();
+        oldPlayerData.levelFinishedStatus = ApplicationManager.LevelFinishedStatus.Win;
+        ApplicationManager.instance.SetPlayerData(oldPlayerData);
         OnLevelFinish(ApplicationManager.LevelFinishedStatus.Win);
     }
 }
