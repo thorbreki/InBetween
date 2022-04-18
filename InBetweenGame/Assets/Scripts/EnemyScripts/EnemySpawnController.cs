@@ -32,7 +32,6 @@ public class EnemySpawnController : MonoBehaviour
     /// </summary>
     [SerializeField] private float speedUpCoolDownSec; // In seconds, how much time needed for the enemy spawner to speed up
 
-    private float spawnCooldown;
     private Vector3 spawnPosition;
     
     private Coroutine spawnEnemiesCoroutine;
@@ -42,9 +41,7 @@ public class EnemySpawnController : MonoBehaviour
     private void Start()
     {
         spawnPosition = new Vector3(0, spawnYLevel, transform.position.z);
-        spawnCooldown = beginningSpawningCooldown;
         spawnEnemiesCoroutine = StartCoroutine(spawnEnemies()); // Start spawning enemies!
-        decreaseSpawningCooldownCoroutine = StartCoroutine(IncreaseSpawningCooldown()); // Start speeding up!
     }
 
     // A coroutine that spawns enemies
@@ -54,51 +51,36 @@ public class EnemySpawnController : MonoBehaviour
         int maxNumOfEnemies = GameManager.instance.numOfEnemiesLeft; // At this time, this variable will equal the actual variable which holds the max amount of enemies
         while (numOfEnemiesSpawned < maxNumOfEnemies)
         {
-            numOfEnemiesSpawned++;
-            int randomEnemyNumber = Random.Range(1, 5); // The number which will decide which enemy type gets spawned
-
-            switch (randomEnemyNumber)
+            if (GameManager.instance.activeEnemies < ApplicationManager.instance.currLevelData.numOfMaxActiveEnemies)
             {
-                case 1:
-                    SpawnEnemy(basicEnemyObject);
-                    break;
-                case 2:
-                    SpawnEnemy(projectileEnemyObject);
-                    break;
-                case 3:
-                    SpawnEnemy(stomperEnemyObject);
-                    break;
-                default: // When the value is 4
-                    SpawnEnemy(rollerEnemyObject);
-                    break;
-            }
-            yield return new WaitForSeconds(spawnCooldown);
-        }
+                numOfEnemiesSpawned++;
+                int randomEnemyNumber = Random.Range(1, 5); // The number which will decide which enemy type gets spawned
 
-        // THE PLAYER HAS MANAGED TO DEFEAT THE LEVEL
-        StopCoroutine(decreaseSpawningCooldownCoroutine);
+                switch (randomEnemyNumber)
+                {
+                    case 1:
+                        SpawnEnemy(basicEnemyObject);
+                        break;
+                    case 2:
+                        SpawnEnemy(projectileEnemyObject);
+                        break;
+                    case 3:
+                        SpawnEnemy(stomperEnemyObject);
+                        break;
+                    default: // When the value is 4
+                        SpawnEnemy(rollerEnemyObject);
+                        break;
+                }
+
+                GameManager.instance.activeEnemies++;
+            }
+            yield return new WaitForSeconds(ApplicationManager.instance.currLevelData.secondsToSpawn);
+        }
     }
 
     private GameObject SpawnEnemy(GameObject newEnemyObject)
     {
         spawnPosition.x = Random.Range(minXSpawn, maxXSpawn);
         return Instantiate(newEnemyObject, spawnPosition, Quaternion.identity);
-    }
-
-    /// <summary>
-    /// This coroutine decreases the spawning cooldown according to the speedUpCooldownSec variable
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerator IncreaseSpawningCooldown()
-    {
-        float divider = Mathf.Min(2, beginningSpawningCooldown);
-        float maxDividerValue = beginningSpawningCooldown;
-        while (true)
-        {
-            yield return new WaitForSeconds(speedUpCoolDownSec);
-            spawnCooldown = beginningSpawningCooldown / divider; // Actually speed up the spawner
-            divider = Mathf.Min(maxDividerValue, divider + 0.4f);
-            print("SpawnCooldown:" + spawnCooldown.ToString());
-        }
     }
 }

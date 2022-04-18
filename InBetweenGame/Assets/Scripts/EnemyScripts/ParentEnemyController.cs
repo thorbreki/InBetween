@@ -34,6 +34,15 @@ public class ParentEnemyController : MonoBehaviour
     protected bool isPlayerShield = false; // To let other parts of the code know that the enemy is currently a Player Shield 
     protected Coroutine playerShieldModeCoroutine;
 
+    [Header("Movement Attributes")]
+    [SerializeField] protected float minMovementSpeed;
+    [SerializeField] protected float maxMovementSpeed;
+    protected float movementSpeed;
+
+    [Header("Attack Attributes")]
+    [SerializeField] protected int baseDamageToPlayer = 2;
+    protected int damageToPlayer; // The damage this enemy does to the player
+
 
     /// <summary>
     /// Sets sqrWallDamageMagnitudeLimit;
@@ -45,6 +54,9 @@ public class ParentEnemyController : MonoBehaviour
     protected virtual void Start()
     {
         boxCollider.size = new Vector2(1, 1);
+
+        movementSpeed = Random.Range(minMovementSpeed, maxMovementSpeed) + ApplicationManager.instance.currLevelData.enemySpeedBoost;
+        damageToPlayer = baseDamageToPlayer + ApplicationManager.instance.currLevelData.enemyDamageBoost;
 
         sqrWallDamageMagnitudeLimit = wallDamageMagnitudeLimit * wallDamageMagnitudeLimit;
         sqrDoubleDamageSpeedLimit = doubleDamageSpeedLimit * doubleDamageSpeedLimit;
@@ -175,7 +187,7 @@ public class ParentEnemyController : MonoBehaviour
         }
         else if (!isParalyzed) // Player does not have stamina shield active so hurt him!
         {
-            GameManager.instance.playerCombatScript.TakeDamage(2);
+            GameManager.instance.playerCombatScript.TakeDamage(damageToPlayer);
         }
     }
 

@@ -10,10 +10,6 @@ public class RollerEnemyController : ParentEnemyController
     [SerializeField] private float minMovementForce;
     [SerializeField] private float maxMovementForce;
 
-    // The maximum x-velocity the roller can add to itself
-    [SerializeField] private float minMovementSpeed;
-    [SerializeField] private float maxMovementSpeed;
-
     // How long does the roller have to wait before able to roll again
     [SerializeField] private float minMovementCooldown;
     [SerializeField] private float maxMovementCooldown;
@@ -21,7 +17,6 @@ public class RollerEnemyController : ParentEnemyController
     [SerializeField] private CircleCollider2D circleCollider;
 
     private float movementForce; // How much force is added to the Roller when trying to roll into the player
-    private float movementSpeedLimit; // How fast the Roller can go before stop being able to add force to itself (its maximum speed)
 
     private Coroutine attackPlayerCor;
 
@@ -38,8 +33,7 @@ public class RollerEnemyController : ParentEnemyController
         sqrWallDamageMagnitudeLimit = wallDamageMagnitudeLimit * wallDamageMagnitudeLimit;
 
         // Initializing the movement values so they can be used
-        movementForce = Random.Range(minMovementForce, maxMovementForce);
-        movementSpeedLimit = Random.Range(minMovementSpeed, maxMovementSpeed);
+        movementForce = Random.Range(minMovementForce, maxMovementForce) + ApplicationManager.instance.currLevelData.enemySpeedBoost;
 
         knockBackVector = Vector2.zero;
         attackPlayerVector = Vector2.zero; // Initialize the vector
@@ -122,7 +116,7 @@ public class RollerEnemyController : ParentEnemyController
 
             bool isLeftOfPlayer = transform.position.x < playerTransform.position.x; // Know this seperately in order to evaluate whether Roller has already passed the Player
             attackPlayerVector.x = isLeftOfPlayer ? movementForce : -movementForce; // the x force of the attackVector is the only one that matters
-            while (Mathf.Abs(rigidBody.velocity.x) < movementSpeedLimit) // This loop runs until the Roller achieves maximum speed
+            while (Mathf.Abs(rigidBody.velocity.x) < movementSpeed) // This loop runs until the Roller achieves maximum speed
             {
                 rigidBody.AddForce(attackPlayerVector); // Add force over time
                 if ((transform.position.x < playerTransform.position.x) != isLeftOfPlayer) { break; } // If Roller has already passed the Player, stop adding force

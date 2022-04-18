@@ -18,7 +18,10 @@ public class GameManager : MonoBehaviour
 
     private int coinCount = 0;
 
+
     [HideInInspector] public int numOfEnemiesLeft;
+
+    public int activeEnemies = 0;
 
     public static GameManager instance;
 
@@ -31,8 +34,8 @@ public class GameManager : MonoBehaviour
         // SET UP NECESSARY VALUES REGARDING THE LEVEL
 
         // TODO: exchange debug line for the actual line
-        //numOfEnemiesLeft = ApplicationManager.instance.currLevelData.totalAmountOfEnemies; // Set up the actual amount of enemies left
-        numOfEnemiesLeft = 5;
+        numOfEnemiesLeft = ApplicationManager.instance.currLevelData.totalAmountOfEnemies; // Set up the actual amount of enemies left
+        //numOfEnemiesLeft = 5;
 
         enemyCountText.text = numOfEnemiesLeft.ToString();
 
@@ -44,7 +47,6 @@ public class GameManager : MonoBehaviour
     /// <param name="newLevelStatus"></param>
     private void OnLevelFinish(ApplicationManager.LevelFinishedStatus newLevelStatus)
     {
-        ApplicationManager.instance.GetPlayerData().levelFinishedStatus = newLevelStatus;
         ApplicationManager.instance.SavePlayerData();
     }
 
@@ -76,6 +78,7 @@ public class GameManager : MonoBehaviour
     public void OnEnemyDeath()
     {
         numOfEnemiesLeft--;
+        activeEnemies--;
         enemyCountText.text = numOfEnemiesLeft.ToString();
 
         if (numOfEnemiesLeft == 0) { OnPlayerWin(); }

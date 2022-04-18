@@ -11,10 +11,7 @@ public class StomperController : ParentEnemyController
                      public PlayerCombat playerCombatScript;
 
     [Header("Movement Attributes")]
-    [SerializeField] private float minMovementSpeed;
-    [SerializeField] private float maxMovementSpeed;
     [SerializeField] private float velocityChangeSpeed; // How fast the enemy can change his velocity's direction
-    private float movementSpeed;
 
     [Header("Attack Attributes")]
     [SerializeField] private float minAttackForce; // The minimum speed the enemy goes down to kill
@@ -42,7 +39,6 @@ public class StomperController : ParentEnemyController
 
         indicator = Instantiate(indicatorObject, transform.position, Quaternion.identity);
 
-        movementSpeed = Random.Range(minMovementSpeed, maxMovementSpeed);
         attackForce = Random.Range(minAttackForce, maxAttackForce);
         attackVector = new Vector2(0, -attackForce);
 

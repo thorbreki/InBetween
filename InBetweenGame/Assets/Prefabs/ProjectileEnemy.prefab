@@ -105,6 +105,7 @@ MonoBehaviour:
   spriteRenderer: {fileID: 2988966971629580032}
   coinObject: {fileID: 761656200601707831, guid: a7fd4ed7b36d4da4abccdb4ea3299bc7, type: 3}
   damageIndicatorPrefab: {fileID: 1834347649945839030, guid: 30af15d0ca84f184ebf8c474c587a0db, type: 3}
+  numberOfEnemiesLeftText: {fileID: 0}
   maxHealth: 3
 --- !u!61 &4009632552746376388
 BoxCollider2D:
@@ -165,31 +166,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86469beea0bc63f42bd74d35ccf721c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerTransform: {fileID: 0}
   healthScript: {fileID: 3962266287077528349}
+  boxCollider: {fileID: 4009632552746376388}
   rigidBody: {fileID: 458669069302922075}
-  projectileObject: {fileID: 536630327325091228, guid: 1641fa175f680e04c99759262027196e, type: 3}
   spriteRenderer: {fileID: 2988966971629580032}
+  wallDamageMagnitudeLimit: 8
+  wallCollisionDamage: 0.2
+  normalColor: {r: 1, g: 0.3647059, b: 0.3647059, a: 1}
+  paralyzedColor: {r: 0.5943396, g: 0.3504361, b: 0.3504361, a: 1}
+  playerShieldObject: {fileID: 6707255774807567814}
+  playerShieldSpriteRenderer: {fileID: 7749343080796179283}
+  playerShieldColor: {r: 0, g: 0.9960785, b: 0.9803922, a: 1}
+  playerShield2Color: {r: 1, g: 0.64705884, b: 0, a: 1}
+  playerShieldDamage: 1
+  doubleDamageSpeedLimit: 10
+  minMovementSpeed: 3.5
+  maxMovementSpeed: 3.5
+  projectileObject: {fileID: 536630327325091228, guid: 1641fa175f680e04c99759262027196e, type: 3}
   minDistance: 2
   maxDistance: 14
-  movementSpeed: 3.5
   velocityChangeSpeed: 0.5
   minProjectileSpeed: 6
   maxProjectileSpeed: 9
   minProjectileCooldown: 3
   maxProjectileCooldown: 3
   shootingInaccuracy: 3
-  normalColor: {r: 1, g: 0.3647059, b: 0.3647059, a: 1}
-  paralyzedColor: {r: 0.5943396, g: 0.3504361, b: 0.3504361, a: 1}
-  wallDamageMagnitudeLimit: 8
-  wallCollisionDamage: 0.2
-  playerShieldObject: {fileID: 6707255774807567814}
-  playerShieldSpriteRenderer: {fileID: 7749343080796179283}
-  playerShieldColor: {r: 0, g: 0.9960785, b: 0.9803922, a: 1}
-  playerShield2Color: {r: 1, g: 0.64705884, b: 0, a: 1}
-  boxCollider: {fileID: 4009632552746376388}
-  playerShieldDamage: 1
-  doubleDamageSpeedLimit: 10
-  playerTransform: {fileID: 0}
 --- !u!1 &6707255774807567814
 GameObject:
   m_ObjectHideFlags: 0

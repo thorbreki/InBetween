@@ -75,7 +75,7 @@ public class LevelsGenerator : MonoBehaviour
             /* -- CREATE NEW INSTANCES OF LEVELDATA CLASS AND ADD THEM TO THE LEVELDATAARRAY CLASS -- */
             LevelData currLevelData = new LevelData();
             currLevelData.totalAmountOfEnemies = (i+1) * 2;
-            currLevelData.secondsToSpawn = 20f / (i + 1);
+            currLevelData.secondsToSpawn = 3f;
             currLevelData.enemyDamageBoost = ApplicationManager.instance.GetPlayerData().currentLevel > 50 ? 1 : 0; // When player has gotten to over level 50, enemies/projectiles to 1 more damge
             currLevelData.enemySpeedBoost = 0f;
             currLevelData.enemyHealthBoost = ApplicationManager.instance.GetPlayerData().currentLevel > 50 ? 2 : 0; // Enemies get 2 more health after reaching level 50

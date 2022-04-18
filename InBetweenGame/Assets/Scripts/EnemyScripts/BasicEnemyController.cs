@@ -7,10 +7,7 @@ public class BasicEnemyController : ParentEnemyController
     [Header("-- BASIC ENEMY --")]
 
     [Header("Movement Variables")]
-    [SerializeField] private float minMovementSpeed; // The minimum possible movement speed this enemy could have
-    [SerializeField] private float maxMovementSpeed; // The maximum possible movement speed this enemy could have
     [SerializeField] private float velocityChangeSpeed; // How fast the enemy can change his velocity's direction
-    private float movementSpeed;
     private Coroutine moveToPlayerCoroutine; // Coroutine object for enemy moving towards player
 
 
@@ -21,9 +18,6 @@ public class BasicEnemyController : ParentEnemyController
     protected override void Start()
     {
         base.Start();
-
-        // Initialize values
-        movementSpeed = Random.Range(minMovementSpeed, maxMovementSpeed);
 
         // Initialize vectors
         toPlayerVector = Vector2.zero;
@@ -91,8 +85,8 @@ public class BasicEnemyController : ParentEnemyController
         }
         else if (!isParalyzed) // Player does not have stamina shield active so hurt him!
         {
-            GameManager.instance.playerCombatScript.TakeDamage(2);
-            Destroy(gameObject);
+            GameManager.instance.playerCombatScript.TakeDamage(damageToPlayer);
+            healthScript.Die(); // Promptly die
         }
     }
 

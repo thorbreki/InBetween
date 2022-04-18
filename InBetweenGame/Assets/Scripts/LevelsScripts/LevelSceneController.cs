@@ -182,11 +182,14 @@ public class LevelSceneController : MonoBehaviour
         }
 
         // Update the currentLevel stored on disk
-        ApplicationManager.instance.GetPlayerData().currentLevel += ApplicationManager.instance.GetPlayerData().levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win ? sum : -sum;
-        ApplicationManager.instance.GetPlayerData().currentLevel = Mathf.Min(ApplicationManager.instance.GetPlayerData().currentLevel, 100); // TODO: FIND SOME WAY TO ACCESS CONST IN GENERATOR
-        ApplicationManager.instance.GetPlayerData().currentLevel = Mathf.Max(ApplicationManager.instance.GetPlayerData().currentLevel, 1);
-        ApplicationManager.instance.currLevelData = levelsGenerator.levelDataArray.arrayOfLevelData[ApplicationManager.instance.GetPlayerData().currentLevel - 1];
+        PlayerData oldPlayerData = ApplicationManager.instance.GetPlayerData();
 
+        oldPlayerData.prevLevel = oldPlayerData.currentLevel;
+        oldPlayerData.currentLevel += ApplicationManager.instance.GetPlayerData().levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win ? sum : -sum;
+        oldPlayerData.currentLevel = Mathf.Min(ApplicationManager.instance.GetPlayerData().currentLevel, 100); // TODO: FIND SOME WAY TO ACCESS CONST IN GENERATOR
+        oldPlayerData.currentLevel = Mathf.Max(ApplicationManager.instance.GetPlayerData().currentLevel, 1);
+        ApplicationManager.instance.currLevelData = levelsGenerator.levelDataArray.arrayOfLevelData[ApplicationManager.instance.GetPlayerData().currentLevel - 1];
+        ApplicationManager.instance.SetPlayerData(oldPlayerData);
         StartCoroutine(FadeInLevelsText());
     }
 
@@ -246,27 +249,32 @@ public class LevelSceneController : MonoBehaviour
         LevelData currLevel = levelsGenerator.levelDataArray.arrayOfLevelData[currLevelIndex-1];
         LevelData prevLevel = levelsGenerator.levelDataArray.arrayOfLevelData[prevLevelIndex-1];
 
+        print("currLevelIndex = " + currLevelIndex.ToString());
+        print("prevLevelIndex = " + prevLevelIndex.ToString());
+        string differenceString = currLevelIndex > prevLevelIndex ? "+" : "-";
+        print("differenceString = " + differenceString);
+
         levelStatisticsText.text = "";
         
         // ADD TO THE LEVELSTATISTICSTEXT THE LEVEL ATTRIBUTES THAT HAVE GOTTEN TOUGHER
-        if (currLevel.totalAmountOfEnemies > prevLevel.totalAmountOfEnemies)
+        if (currLevel.totalAmountOfEnemies != prevLevel.totalAmountOfEnemies)
         {
-            levelStatisticsText.text += "+ Amount of Enemies";
-        } if (currLevel.enemyDamageBoost > prevLevel.enemyDamageBoost)
+            levelStatisticsText.text += differenceString + " Amount of Enemies";
+        } if (currLevel.enemyDamageBoost != prevLevel.enemyDamageBoost)
         {
-            levelStatisticsText.text += "\n+ Enemy Damage";
-        } if (currLevel.enemyHealthBoost > prevLevel.enemyHealthBoost)
+            levelStatisticsText.text += "\n" + differenceString + " Enemy Damage";
+        } if (currLevel.enemyHealthBoost != prevLevel.enemyHealthBoost)
         {
-            levelStatisticsText.text += "\n+ Enemy Health";
-        } if (currLevel.enemySpeedBoost > prevLevel.enemySpeedBoost)
+            levelStatisticsText.text += "\n" + differenceString + " Enemy Health";
+        } if (currLevel.enemySpeedBoost != prevLevel.enemySpeedBoost)
         {
-            levelStatisticsText.text += "\n+ Enemy Speed";
-        } if (currLevel.secondsToSpawn < prevLevel.secondsToSpawn)
+            levelStatisticsText.text += "\n" + differenceString + " Enemy Speed";
+        } if (currLevel.secondsToSpawn != prevLevel.secondsToSpawn)
         {
-            levelStatisticsText.text += "\n+ Spawn Rate";
-        } if (currLevel.numOfMaxActiveEnemies > prevLevel.numOfMaxActiveEnemies)
+            levelStatisticsText.text += "\n" + differenceString + " Spawn Rate";
+        } if (currLevel.numOfMaxActiveEnemies != prevLevel.numOfMaxActiveEnemies)
         {
-            levelStatisticsText.text += "\n+ Number of Active Enemies";
+            levelStatisticsText.text += "\n" + differenceString + " Number of Active Enemies";
         }
 
         StartCoroutine(FadeText(levelStatisticsText, 0f, 1f));

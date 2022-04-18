@@ -12,7 +12,6 @@ public class ProjectileEnemyController : ParentEnemyController
     [Header("Movement Attributes")]
     [SerializeField] private float minDistance; // The lower bound of the random distance the enemy wants to keep from the player
     [SerializeField] private float maxDistance; // The higher bound (EXCLUSIVE IN THE RANDOM FUNCTION)
-    [SerializeField] private float movementSpeed; // The enemy's movementSpeed
     [SerializeField] private float velocityChangeSpeed; // How fast the enemy can change its course
     private float targetDistanceFromGround;
     private float targetXDistanceFromPlayer;

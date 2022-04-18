@@ -18,7 +18,7 @@ public class EnemyHealthController : MonoBehaviour
                      private GameObject damageIndicatorObject;
 
     [Header("Health Attributes")]
-    [SerializeField] private int maxHealth = 1;
+    [SerializeField] private int maxHealth = 1; // This is the base level of health the enemy can have
 
     private Vector3 damageIndicatorPosition;
 
@@ -27,7 +27,7 @@ public class EnemyHealthController : MonoBehaviour
 
     private void Start()
     {
-        health = maxHealth;
+        health = maxHealth + ApplicationManager.instance.currLevelData.enemyHealthBoost;
         damageIndicatorPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z - 0.1f);
 
         // Get the text component of the damage indicator object
@@ -56,7 +56,7 @@ public class EnemyHealthController : MonoBehaviour
         }
     }
 
-    private void Die()
+    public void Die()
     {
         // Deactivate collider and sprite renderer
         if (boxCollider != null)
