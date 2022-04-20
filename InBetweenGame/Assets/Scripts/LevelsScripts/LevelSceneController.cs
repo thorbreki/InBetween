@@ -136,6 +136,14 @@ public class LevelSceneController : MonoBehaviour
 
         yield return new WaitForSeconds(1.5f);
 
+        print(ApplicationManager.instance.GetPlayerData().currentLevel - 1);
+        print("starting the loop!");
+        for (int i = 0; i < levelsGenerator.levelDataArray.arrayOfLevelData.Length; i++)
+        {
+            print(levelsGenerator.levelDataArray.arrayOfLevelData[i]);
+        }
+        ApplicationManager.instance.currLevelData = levelsGenerator.levelDataArray.arrayOfLevelData[ApplicationManager.instance.GetPlayerData().currentLevel - 1];
+
         // FADING OUT THE WELCOME TEXT
         StartCoroutine(FadeText(welcomeText, 1f, 0f, FadeInLevelStatisticsText()));
     }
