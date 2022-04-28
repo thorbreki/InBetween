@@ -33,8 +33,6 @@ public class ApplicationManager : MonoBehaviour
         }
         instance = this;
         Application.targetFrameRate = 60;
-
-        // TODO: REMOVE THIS LINE WHEN DONE IMPLEMENTING BASIC LEVELS SCENE FUNCITONALITY
     }
 
     public PlayerData GetPlayerData()
@@ -71,18 +69,7 @@ public class ApplicationManager : MonoBehaviour
 
     private void InitializePlayerData()
     {
-        playerData = new PlayerData();
-        playerData.currentLevel = 1;
-        playerData.prevLevel = 1;
-        playerData.maxHealth = 8;
-        playerData.pistolDamage = 1;
-        playerData.bombDamage = 2;
-        playerData.staminaShieldDamage = 1;
-        playerData.gunShieldParalyzationSeconds = 5f;
-        playerData.bombParalyzationSeconds = 5f;
-        playerData.maxStamina = 10;
-        playerData.maxGunEnergy = 10;
-        playerData.levelFinishedStatus = ApplicationManager.LevelFinishedStatus.No;
+        playerData = GetBasePlayerData();
     }
 
     public void SavePlayerData()
@@ -92,5 +79,58 @@ public class ApplicationManager : MonoBehaviour
         binaryFormatter.Serialize(saveFile, ApplicationManager.instance.playerData);
 
         saveFile.Close();
+    }
+
+    /// <summary>
+    /// Returns the abilities of a starting player
+    /// </summary>
+    /// <returns></returns>
+    public PlayerData GetBasePlayerData()
+    {
+        PlayerData basePlayerData = new PlayerData();
+        basePlayerData.currentLevel = 1;
+        basePlayerData.prevLevel = 1;
+        basePlayerData.pistolAccuracy = 3;
+        basePlayerData.maxHealth = 8;
+        basePlayerData.pistolDamage = 1;
+        basePlayerData.pistolCooldown = 1;
+        basePlayerData.bombCooldown = 2;
+        basePlayerData.helperCooldown = 3;
+        basePlayerData.bombDamage = 2;
+        basePlayerData.staminaShieldDamage = 1;
+        basePlayerData.gunShieldParalyzationSeconds = 5f;
+        basePlayerData.bombParalyzationSeconds = 5f;
+        basePlayerData.maxStamina = 10;
+        basePlayerData.maxGunEnergy = 10;
+        basePlayerData.levelFinishedStatus = LevelFinishedStatus.No;
+
+        return basePlayerData;
+    }
+
+
+    /// <summary>
+    /// Returns the abilities of a fully upgraded player
+    /// </summary>
+    /// <returns></returns>
+    public PlayerData GetMaxedOutPlayerData()
+    {
+        PlayerData maxPlayerData = new PlayerData();
+        maxPlayerData.currentLevel = 1;
+        maxPlayerData.prevLevel = 1;
+        maxPlayerData.maxHealth = 100;
+        maxPlayerData.pistolDamage = 50;
+        maxPlayerData.pistolAccuracy = 0.05f;
+        maxPlayerData.pistolCooldown = 0.05f;
+        maxPlayerData.bombCooldown = 0.05f;
+        maxPlayerData.helperCooldown = 0.05f;
+        maxPlayerData.bombDamage = 150;
+        maxPlayerData.staminaShieldDamage = 100;
+        maxPlayerData.gunShieldParalyzationSeconds = 120f;
+        maxPlayerData.bombParalyzationSeconds = 120f;
+        maxPlayerData.maxStamina = 200;
+        maxPlayerData.maxGunEnergy = 1000;
+        maxPlayerData.levelFinishedStatus = LevelFinishedStatus.No;
+
+        return maxPlayerData;
     }
 }

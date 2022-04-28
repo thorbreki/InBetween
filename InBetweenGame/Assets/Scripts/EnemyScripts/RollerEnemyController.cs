@@ -24,6 +24,7 @@ public class RollerEnemyController : ParentEnemyController
 
     protected override void Start()
     {
+        movementSpeed = Random.Range(minMovementSpeed, maxMovementSpeed) + ApplicationManager.instance.currLevelData.enemySpeedBoost;
         // Initialize objects and components
         playerTransform = GameManager.instance.playerTransform;
         playerShieldObject.SetActive(false);
@@ -122,6 +123,7 @@ public class RollerEnemyController : ParentEnemyController
                 if ((transform.position.x < playerTransform.position.x) != isLeftOfPlayer) { break; } // If Roller has already passed the Player, stop adding force
                 yield return null; // Just wait until next frame
             }
+            print("Not slower than movement speed!");
             attackPlayerVector.x = 0; // Setting this to zero so it's completely known that this Roller is not trying to move
         }
     }

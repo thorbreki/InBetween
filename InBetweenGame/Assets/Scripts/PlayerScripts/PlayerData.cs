@@ -8,6 +8,10 @@ public class PlayerData
     public int prevLevel;
     public int maxHealth;
     public int pistolDamage;
+    public float pistolAccuracy;
+    public float pistolCooldown;
+    public float bombCooldown;
+    public float helperCooldown;
     public int bombDamage;
     public int staminaShieldDamage;
     public float gunShieldParalyzationSeconds;

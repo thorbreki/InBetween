@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject gameOverUI; // The UI which is visible when the player is dead
     [SerializeField] private GameObject gameWonUI; // The UI which is visible when the player has beaten the level
     [SerializeField] private TextMeshProUGUI enemyCountText;
+    [SerializeField] private CanvasFunctions canvasFunctions;
 
     public Transform playerTransform;
     public PlayerMovement playerMovementScript;
@@ -30,6 +31,7 @@ public class GameManager : MonoBehaviour
         instance = this;
         gameRunningUI.SetActive(true); // Making sure
         gameOverUI.SetActive(false); // Making sure
+        gameWonUI.SetActive(false);
 
         // SET UP NECESSARY VALUES REGARDING THE LEVEL
 
@@ -57,6 +59,7 @@ public class GameManager : MonoBehaviour
     {
         gameRunningUI.SetActive(false);
         gameOverUI.SetActive(true);
+        canvasFunctions.ActivateUpgradeUI();
         PlayerData oldPlayerData = ApplicationManager.instance.GetPlayerData();
         oldPlayerData.levelFinishedStatus = ApplicationManager.LevelFinishedStatus.Loss;
         ApplicationManager.instance.SetPlayerData(oldPlayerData);
@@ -91,6 +94,7 @@ public class GameManager : MonoBehaviour
     {
         gameRunningUI.SetActive(false);
         gameWonUI.SetActive(true);
+        canvasFunctions.ActivateUpgradeUI();
         PlayerData oldPlayerData = ApplicationManager.instance.GetPlayerData();
         oldPlayerData.levelFinishedStatus = ApplicationManager.LevelFinishedStatus.Win;
         ApplicationManager.instance.SetPlayerData(oldPlayerData);

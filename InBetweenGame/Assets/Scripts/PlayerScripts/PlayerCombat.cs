@@ -20,11 +20,20 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] private float gunEnergyRechargeRate = 0.1f; // The rate of recharging for the gun's energy
     [SerializeField] private float shootingInaccuracy = 0.0f; // How inaccurate the player's shooting is
 
+    private bool canShootPistol = true;
+    private Coroutine pistolCooldownCoroutine;
+
     [Header("Bomb Attributes")]
     public float explosionRadius;
     public float explosionTimeToLive;
     public float explosionParalyzationSeconds; // How long the bomb paralyzes the enemies
     public float explosionMaxForce;
+
+    private bool canShootBomb = true;
+    private Coroutine bombCooldownCoroutine;
+
+    [Header("Helper Attributes")]
+    private bool canShootHelper = true;
 
     private enum GunMode
     {
@@ -94,11 +103,13 @@ public class PlayerCombat : MonoBehaviour
     private void HandlePlayerPistolAttack()
     {
         // When player presses left mouse button, instantiate projectile
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             if (gunEnergy < PistolEnergyPenalty)
                 return; // You don't want to do anything if the player doesn't have enough energy to shoot
 
+            if (!canShootPistol)
+                return;
             gunEnergy -= PistolEnergyPenalty; // When player shoots, always loses energy
 
             mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -115,6 +126,9 @@ public class PlayerCombat : MonoBehaviour
                 }
             }
 
+            // Start the cooldown coroutine
+            StartCoroutine(pistolCooldownCor());
+
             // Spawn in the shot effect line
             //print(attackDirection);
             if (attackDirection.y < 0f)
@@ -126,6 +140,26 @@ public class PlayerCombat : MonoBehaviour
                 Instantiate(shootEffectObject, transform.position, Quaternion.Euler(0, 0, Vector2.Angle(attackDirection, groundVector)));
             }
         }
+    }
+
+    private IEnumerator pistolCooldownCor()
+    {
+        canShootPistol = false;
+        yield return new WaitForSeconds(ApplicationManager.instance.GetPlayerData().pistolCooldown);
+        canShootPistol = true;
+    }
+
+    private IEnumerator bombCooldownCor()
+    {
+        canShootBomb = false;
+        yield return new WaitForSeconds(ApplicationManager.instance.GetPlayerData().bombCooldown);
+        canShootBomb = true;
+    }
+
+    private IEnumerator helperCooldownCor()
+    {
+        canShootHelper = false;
+        yield return new WaitForSeconds(ApplicationManager.instance.GetPlayerData().helperCooldown);
     }
 
     /// <summary>
