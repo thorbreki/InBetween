@@ -25,6 +25,8 @@ public class EnemyHealthController : MonoBehaviour
     private float health;
     private Coroutine showDamageCoroutine;
 
+    private bool alreadyDied = false; // A guard to make sure the Die() function does not run more often than once
+
     private void Start()
     {
         health = maxHealth + ApplicationManager.instance.currLevelData.enemyHealthBoost;
@@ -52,7 +54,11 @@ public class EnemyHealthController : MonoBehaviour
 
         if (health <= 0)
         {
-            Die();
+            if (!alreadyDied)
+            {
+                alreadyDied = true;
+                Die();
+            }
         }
     }
 
@@ -75,9 +81,6 @@ public class EnemyHealthController : MonoBehaviour
         // Spawn in the coin
         Instantiate(coinObject, transform.position, transform.rotation);
 
-        // Let Game Manager know I have died
-        GameManager.instance.OnEnemyDeath();
-
         // Die
         Destroy(gameObject);
     }
@@ -95,5 +98,7 @@ public class EnemyHealthController : MonoBehaviour
     private void OnDestroy()
     {
         StopAllCoroutines();
+        // Let Game Manager know I have died
+        GameManager.instance.OnEnemyDeath();
     }
 }

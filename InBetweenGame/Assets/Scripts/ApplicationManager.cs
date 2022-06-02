@@ -11,6 +11,10 @@ public class ApplicationManager : MonoBehaviour
     private PlayerData playerData;
     [HideInInspector] public LevelData currLevelData;
 
+    [Header("PistolAccuracyUpgrade")]
+    [SerializeField] private float pistolAccuracyUpgradeAmount;
+    [SerializeField] private int pistolAccuracyUpgradeCost;
+    [SerializeField] private int pistolAccuracyUpgradeCostMultiplier;
     private const string DIR_NAME = "Player";
     private const string FILE_NAME = "data.binary";
 
@@ -92,6 +96,7 @@ public class ApplicationManager : MonoBehaviour
         basePlayerData.prevLevel = 1;
         basePlayerData.pistolAccuracy = 3;
         basePlayerData.maxHealth = 8;
+        basePlayerData.coins = 0;
         basePlayerData.pistolDamage = 1;
         basePlayerData.pistolCooldown = 1;
         basePlayerData.bombCooldown = 2;
@@ -118,6 +123,7 @@ public class ApplicationManager : MonoBehaviour
         maxPlayerData.currentLevel = 1;
         maxPlayerData.prevLevel = 1;
         maxPlayerData.maxHealth = 100;
+        maxPlayerData.coins = 0;
         maxPlayerData.pistolDamage = 50;
         maxPlayerData.pistolAccuracy = 0.05f;
         maxPlayerData.pistolCooldown = 0.05f;
@@ -132,5 +138,23 @@ public class ApplicationManager : MonoBehaviour
         maxPlayerData.levelFinishedStatus = LevelFinishedStatus.No;
 
         return maxPlayerData;
+    }
+
+
+    // ------- SETTERS FOR THE PLAYERDATA FIELD
+
+    public void addCoins(int amount)
+    {
+        playerData.coins += amount;
+    }
+
+    public void upgradePistolAccuracy()
+    {
+        // HOW MUCH MONEY IS NEEDED TO UPGRADE THIS UPGRADE HAS TO BE SAVED AS WELL
+        if (playerData.pistolAccuracy == GetMaxedOutPlayerData().pistolAccuracy) { return; }
+        else if (playerData.coins < pistolAccuracyUpgradeCost) { return; }
+        playerData.pistolAccuracy = Mathf.Max(playerData.pistolAccuracy - 0.2f, 0f);
+        GameManager.instance.AddCoins(-pistolAccuracyUpgradeCost);
+        pistolAccuracyUpgradeCost *= pistolAccuracyUpgradeCostMultiplier;
     }
 }

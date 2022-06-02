@@ -15,7 +15,7 @@ public class CoinController : MonoBehaviour
     {
         if (collision.transform.CompareTag("Player"))
         {
-            GameManager.instance.AddCoin();
+            GameManager.instance.AddCoins(1);
             Destroy(gameObject);
         }
     }

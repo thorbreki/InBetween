@@ -188,7 +188,7 @@ public class PlayerCombat : MonoBehaviour
     /// </summary>
     private void DamageEnemy(Transform hit)
     {
-        hit.transform.GetComponent<EnemyHealthController>().TakeDamage(1);
+        hit.transform.GetComponent<EnemyHealthController>().TakeDamage(ApplicationManager.instance.GetMaxedOutPlayerData().pistolDamage);
     }
 
     /// <summary>

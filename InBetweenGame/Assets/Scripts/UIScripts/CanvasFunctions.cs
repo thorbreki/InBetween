@@ -21,6 +21,12 @@ public class CanvasFunctions : MonoBehaviour
 
     private Vector3 progressBarScaleVector;
 
+    [HideInInspector]
+    public enum UpgradeType
+    {
+        pistolAccuracy = 0
+    }
+
     private void Start()
     {
         Time.timeScale = 1f;
@@ -101,6 +107,19 @@ public class CanvasFunctions : MonoBehaviour
     {
         // Pistol Accuracy
         SetProgressBarScale(pistolAccuracyProgressBar, ApplicationManager.instance.GetPlayerData().pistolAccuracy, 3, 0);
+    }
+
+    public void UpgradeAbility(int type)
+    {
+        switch (type)
+        {
+            case (int)UpgradeType.pistolAccuracy:
+                ApplicationManager.instance.upgradePistolAccuracy();
+                break;
+            default:
+                ApplicationManager.instance.upgradePistolAccuracy();
+                break;
+        }
     }
 
     private void SetProgressBarScale(RectTransform theProgressBar, float currValue, float maxValue, float minValue)

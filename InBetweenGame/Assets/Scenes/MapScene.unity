@@ -13382,18 +13382,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf6240373b8028242a60615c1124893c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerData:
-    currentLevel: 0
-    prevLevel: 0
-    maxHealth: 0
-    pistolDamage: 0
-    bombDamage: 0
-    staminaShieldDamage: 0
-    gunShieldParalyzationSeconds: 0
-    bombParalyzationSeconds: 0
-    maxStamina: 0
-    maxGunEnergy: 0
-  finishedLevelStatus: 2
+  currLevelData:
+    totalAmountOfEnemies: 0
+    secondsToSpawn: 0
+    enemyDamageBoost: 0
+    enemySpeedBoost: 0
+    enemyHealthBoost: 0
+    numOfMaxActiveEnemies: 0
+  pistolAccuracyUpgradeAmount: -0.2
+  pistolAccuracyUpgradeCost: 5
+  pistolAccuracyUpgradeCostMultiplier: 2
 --- !u!114 &1507859478
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -7,6 +7,7 @@ public class PlayerData
     public int currentLevel; // NOT ZERO INDEXED
     public int prevLevel;
     public int maxHealth;
+    public int coins;
     public int pistolDamage;
     public float pistolAccuracy;
     public float pistolCooldown;

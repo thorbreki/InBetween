@@ -7,6 +7,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject gameRunningUI; // The UI which is visible when the game is running
     [SerializeField] private GameObject gameOverUI; // The UI which is visible when the player is dead
     [SerializeField] private GameObject gameWonUI; // The UI which is visible when the player has beaten the level
+    [SerializeField] private GameObject upgradeUI;
+    [SerializeField] private TextMeshProUGUI coinAmountText;
     [SerializeField] private TextMeshProUGUI enemyCountText;
     [SerializeField] private CanvasFunctions canvasFunctions;
 
@@ -16,8 +18,6 @@ public class GameManager : MonoBehaviour
     public StaminaShieldController staminaShieldControllerScript;
     public ShieldController shieldControllerScript;
     public BombController bombControllerScript;
-
-    private int coinCount = 0;
 
 
     [HideInInspector] public int numOfEnemiesLeft;
@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
         gameRunningUI.SetActive(true); // Making sure
         gameOverUI.SetActive(false); // Making sure
         gameWonUI.SetActive(false);
+        upgradeUI.SetActive(false);
 
         // SET UP NECESSARY VALUES REGARDING THE LEVEL
 
@@ -69,9 +70,10 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Add 1 coin to the player's coin count
     /// </summary>
-    public void AddCoin()
+    public void AddCoins(int amount)
     {
-        coinCount++;
+        ApplicationManager.instance.addCoins(amount);
+        coinAmountText.text = ApplicationManager.instance.GetPlayerData().coins.ToString() + " c";
     }
 
 
