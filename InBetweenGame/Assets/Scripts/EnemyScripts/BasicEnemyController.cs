@@ -80,8 +80,10 @@ public class BasicEnemyController : ParentEnemyController
             if (isParalyzed)
             {
                 StartCoroutine(PlayerShieldModeCor());
+            } else
+            {
+                GameManager.instance.playerMovementScript.playerRanIntoUnparalyzedEnemy = true;
             }
-            GameManager.instance.playerMovementScript.OnStaminaShieldProtect();
         }
         else if (!isParalyzed) // Player does not have stamina shield active so hurt him!
         {

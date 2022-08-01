@@ -26,20 +26,14 @@ public class PlayerMovement : MonoBehaviour
 
     [Header("Jumping attributes")]
     [SerializeField] private float jumpForce = 300f;
-    [SerializeField] private float jumpStaminaPenalty;
 
     [Header("Running attributes")]
-    public float maxStamina; // The max amount of stamina the player can have
-    [SerializeField] private float staminaDepletionRate; // How fast the stamina is spent
-    [SerializeField] private float staminaRechargeRate; // How fast the stamina recharges
     [SerializeField] private float runningSpeed; // How fast the player moves when running
-    [HideInInspector] public float stamina; // The stamina the player has currently
 
-    private bool allowedToRun = true; // This is primarily used for when player depletes the stamina and therefore is not allowed to run after that 
+    [HideInInspector] public bool playerRanIntoUnparalyzedEnemy = false;
 
     private void Start()
     {
-        stamina = maxStamina; // Always starts with as much stamina as possible
         staminaShieldObject.SetActive(false);
 
         moveVector = new Vector2(0, 0); // Initializing the movementVector
@@ -87,27 +81,19 @@ public class PlayerMovement : MonoBehaviour
         bool isPlayerMoving = moveHorizontal != 0f;
         bool isPlayerRunning = Input.GetKey(KeyCode.LeftShift);
 
-        if (isPlayerRunning && allowedToRun)
+        if (isPlayerRunning && !playerRanIntoUnparalyzedEnemy)
         {
             
             moveVector.x = moveHorizontal * runningSpeed;
-            HandlePlayerRunning();
-
-            // When stamina is depleted, the player is not allowed to run again until he stops pressing on the right mouse button
-            if (stamina <= 0f)
-            {
-                allowedToRun = false;
-            }
         }
         else
         {
             moveVector.x = moveHorizontal * movementSpeed;
-            HandlePlayerWalking(isPlayerMoving);
 
             // When the player stops pressing on the right mouse button after depleting the stamina
-            if (!allowedToRun && Input.GetKeyUp(KeyCode.LeftShift))
+            if (playerRanIntoUnparalyzedEnemy && Input.GetKeyUp(KeyCode.LeftShift))
             {
-                allowedToRun = true; // Then they are finally able to run again, yay!
+                playerRanIntoUnparalyzedEnemy = false; // Then they are finally able to run again, yay!
             }
         }
     }
@@ -117,39 +103,16 @@ public class PlayerMovement : MonoBehaviour
     /// </summary>
     private void HandleJumping()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && stamina >= jumpStaminaPenalty)
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             isJumping = true;
             alreadyJumped = false;
-            stamina -= jumpStaminaPenalty;
-        }
-    }
-
-    /// <summary>
-    /// This function does everything necessary when the player runs
-    /// </summary>
-    private void HandlePlayerRunning()
-    {
-        stamina = Mathf.Max(0f, stamina - (staminaDepletionRate * Time.deltaTime));
-    }
-
-    /// <summary>
-    /// Do stuff when the player is walking or still instead of running
-    /// </summary>
-    private void HandlePlayerWalking(bool playerIsMoving)
-    {
-        if (playerIsMoving)
-        {
-            stamina = Mathf.Min(maxStamina, stamina + (staminaRechargeRate * Time.deltaTime * 0.7f));
-        } else
-        {
-            stamina = Mathf.Min(maxStamina, stamina + (staminaRechargeRate * Time.deltaTime));
         }
     }
 
     private void HandleStaminaShield()
     {
-        if (Input.GetKeyDown(KeyCode.LeftShift) && allowedToRun)
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !playerRanIntoUnparalyzedEnemy)
         {
             isRunning = true;
             colliderSizeVector.x = 1.5f; colliderSizeVector.y = 1.5f;
@@ -157,18 +120,13 @@ public class PlayerMovement : MonoBehaviour
             staminaShieldObject.SetActive(true);
 
         } 
-        else if (Input.GetKeyUp(KeyCode.LeftShift) || !allowedToRun)
+        else if (Input.GetKeyUp(KeyCode.LeftShift) || playerRanIntoUnparalyzedEnemy)
         {
             isRunning = false;
             colliderSizeVector.x = 1f; colliderSizeVector.y = 1f;
             boxCollider.size = colliderSizeVector;
             staminaShieldObject.SetActive(false);
         } // Set the stamina shield as inactive when not running
-    }
-
-    public void OnStaminaShieldProtect()
-    {
-        stamina -= GameManager.instance.staminaShieldControllerScript.enemyKnockbackStaminaPenalty;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

@@ -142,9 +142,6 @@ public class StomperController : ParentEnemyController
     {
         if (isParalyzed) { return; } // If enemy is already paralyzed, don't do anything
         paralyzeCoroutine = StartCoroutine(ParalyzeCor(GameManager.instance.shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
-
-        // Call the playercombat script through the shield object to make the player lose the correct amount of energy
-        GameManager.instance.shieldControllerScript.playerCombatScript.OnShieldProtect();
     }
 
 

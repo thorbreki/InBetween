@@ -35,7 +35,6 @@ public class EnemySpawnController : MonoBehaviour
     private Vector3 spawnPosition;
     
     private Coroutine spawnEnemiesCoroutine;
-    private Coroutine decreaseSpawningCooldownCoroutine;
 
 
     private void Start()
@@ -49,8 +48,14 @@ public class EnemySpawnController : MonoBehaviour
     {
         yield return new WaitForSeconds(2f);
         int maxNumOfEnemies = GameManager.instance.numOfEnemiesLeft; // At this time, this variable will equal the actual variable which holds the max amount of enemies
+        float secondsToSpawn = ApplicationManager.instance.currLevelData.secondsToSpawn;
         while (numOfEnemiesSpawned < maxNumOfEnemies)
         {
+            if (GameManager.instance.activeEnemies < 2)
+            {
+                //print("Decreased spawning rate to: " + secondsToSpawn.ToString());
+                secondsToSpawn = Mathf.Max(0.2f, secondsToSpawn - 0.2f);
+            }
             if (GameManager.instance.activeEnemies < ApplicationManager.instance.currLevelData.numOfMaxActiveEnemies)
             {
                 numOfEnemiesSpawned++;
@@ -74,7 +79,7 @@ public class EnemySpawnController : MonoBehaviour
 
                 GameManager.instance.activeEnemies++;
             }
-            yield return new WaitForSeconds(ApplicationManager.instance.currLevelData.secondsToSpawn);
+            yield return new WaitForSeconds(secondsToSpawn);
         }
     }
 

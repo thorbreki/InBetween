@@ -92,22 +92,9 @@ public class ApplicationManager : MonoBehaviour
     public PlayerData GetBasePlayerData()
     {
         PlayerData basePlayerData = new PlayerData();
-        basePlayerData.currentLevel = 1;
-        basePlayerData.prevLevel = 1;
-        basePlayerData.pistolAccuracy = 3;
-        basePlayerData.maxHealth = 8;
-        basePlayerData.coins = 0;
-        basePlayerData.pistolDamage = 1;
-        basePlayerData.pistolCooldown = 1;
-        basePlayerData.bombCooldown = 2;
-        basePlayerData.helperCooldown = 3;
-        basePlayerData.bombDamage = 2;
-        basePlayerData.staminaShieldDamage = 1;
-        basePlayerData.gunShieldParalyzationSeconds = 5f;
-        basePlayerData.bombParalyzationSeconds = 5f;
-        basePlayerData.maxStamina = 10;
-        basePlayerData.maxGunEnergy = 10;
-        basePlayerData.levelFinishedStatus = LevelFinishedStatus.No;
+        basePlayerData.currentLevel = 1; // 1
+        basePlayerData.prevLevel = 1; // 1
+        basePlayerData.levelFinishedStatus = LevelFinishedStatus.No; // LevelFinishedStatus.No
 
         return basePlayerData;
     }
@@ -122,39 +109,8 @@ public class ApplicationManager : MonoBehaviour
         PlayerData maxPlayerData = new PlayerData();
         maxPlayerData.currentLevel = 1;
         maxPlayerData.prevLevel = 1;
-        maxPlayerData.maxHealth = 100;
-        maxPlayerData.coins = 0;
-        maxPlayerData.pistolDamage = 50;
-        maxPlayerData.pistolAccuracy = 0.05f;
-        maxPlayerData.pistolCooldown = 0.05f;
-        maxPlayerData.bombCooldown = 0.05f;
-        maxPlayerData.helperCooldown = 0.05f;
-        maxPlayerData.bombDamage = 150;
-        maxPlayerData.staminaShieldDamage = 100;
-        maxPlayerData.gunShieldParalyzationSeconds = 120f;
-        maxPlayerData.bombParalyzationSeconds = 120f;
-        maxPlayerData.maxStamina = 200;
-        maxPlayerData.maxGunEnergy = 1000;
         maxPlayerData.levelFinishedStatus = LevelFinishedStatus.No;
 
         return maxPlayerData;
-    }
-
-
-    // ------- SETTERS FOR THE PLAYERDATA FIELD
-
-    public void addCoins(int amount)
-    {
-        playerData.coins += amount;
-    }
-
-    public void upgradePistolAccuracy()
-    {
-        // HOW MUCH MONEY IS NEEDED TO UPGRADE THIS UPGRADE HAS TO BE SAVED AS WELL
-        if (playerData.pistolAccuracy == GetMaxedOutPlayerData().pistolAccuracy) { return; }
-        else if (playerData.coins < pistolAccuracyUpgradeCost) { return; }
-        playerData.pistolAccuracy = Mathf.Max(playerData.pistolAccuracy - 0.2f, 0f);
-        GameManager.instance.AddCoins(-pistolAccuracyUpgradeCost);
-        pistolAccuracyUpgradeCost *= pistolAccuracyUpgradeCostMultiplier;
     }
 }

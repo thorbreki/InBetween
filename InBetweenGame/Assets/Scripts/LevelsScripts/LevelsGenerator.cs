@@ -54,7 +54,7 @@ public class LevelsGenerator : MonoBehaviour
 
     private void LoadData()
     {
-        print("Loading the levels data!");
+        //print("Loading the levels data!");
         BinaryFormatter formatter = new BinaryFormatter();
         FileStream saveFile = File.Open(DIR_NAME + "/" + FILE_NAME, FileMode.Open);
 
@@ -74,12 +74,12 @@ public class LevelsGenerator : MonoBehaviour
         {
             /* -- CREATE NEW INSTANCES OF LEVELDATA CLASS AND ADD THEM TO THE LEVELDATAARRAY CLASS -- */
             LevelData currLevelData = new LevelData();
-            currLevelData.totalAmountOfEnemies = (i+1) * 2;
-            currLevelData.secondsToSpawn = 3f;
-            currLevelData.enemyDamageBoost = ApplicationManager.instance.GetPlayerData().currentLevel > 50 ? 1 : 0; // When player has gotten to over level 50, enemies/projectiles to 1 more damge
+            currLevelData.totalAmountOfEnemies = (i+1) * 4;
+            currLevelData.secondsToSpawn = 3f - (2.8f * ((float)(i + 1) / 100.0f));
+            currLevelData.enemyDamageBoost = 0;
             currLevelData.enemySpeedBoost = 0f;
-            currLevelData.enemyHealthBoost = ApplicationManager.instance.GetPlayerData().currentLevel > 50 ? 2 : 0; // Enemies get 2 more health after reaching level 50
-            currLevelData.numOfMaxActiveEnemies = i + 1;
+            currLevelData.enemyHealthBoost = 0;
+            currLevelData.numOfMaxActiveEnemies = (i + 1) * 2;
             levelDataArray.arrayOfLevelData[i] = currLevelData;
         }
 

@@ -49,9 +49,6 @@ public class RollerEnemyController : ParentEnemyController
         // Paralyze the Rolller
         if (paralyzeCoroutine != null) { StopCoroutine(paralyzeCoroutine); } // Stop previous paralyzation if it is currently active
         paralyzeCoroutine = StartCoroutine(ParalyzeCor(GameManager.instance.shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
-
-        // Call the playercombat script through the shield object to make the player lose the correct amount of energy
-        GameManager.instance.playerCombatScript.OnShieldProtect();
     }
 
     protected override void OnCollisionEnter2D(Collision2D collision)
@@ -98,8 +95,10 @@ public class RollerEnemyController : ParentEnemyController
                 if (isParalyzed)
                 {
                     StartCoroutine(PlayerShieldModeCor());
+                } else
+                {
+                    GameManager.instance.playerMovementScript.playerRanIntoUnparalyzedEnemy = true;
                 }
-                GameManager.instance.playerMovementScript.OnStaminaShieldProtect();
             }
             else if (!isParalyzed) // Player does not have stamina shield active so hurt him!
             {
@@ -111,7 +110,7 @@ public class RollerEnemyController : ParentEnemyController
 
     private IEnumerator AttackPlayerCoroutine()
     {
-        while (true)
+        while (isParalyzed == false)
         {
             yield return new WaitForSeconds(Random.Range(minMovementCooldown, maxMovementCooldown)); // First the enemy waits for a random amount of time
 

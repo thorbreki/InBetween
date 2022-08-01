@@ -31,4 +31,14 @@ public class UIFunctions : MonoBehaviour
         levelSceneOverlay.color = levelSceneOverlayColor;
         SceneManager.LoadScene(1);
     }
+
+    public void RestartGame()
+    {
+        PlayerData oldPlayerData = ApplicationManager.instance.GetPlayerData();
+        oldPlayerData.prevLevel = 1;
+        oldPlayerData.currentLevel = 1;
+        oldPlayerData.levelFinishedStatus = ApplicationManager.LevelFinishedStatus.No;
+        ApplicationManager.instance.SetPlayerData(oldPlayerData);
+        SceneManager.LoadScene(0);
+    }
 }

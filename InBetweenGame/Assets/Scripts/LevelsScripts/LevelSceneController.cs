@@ -18,6 +18,7 @@ public class LevelSceneController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI welcomeText; // Text that bids the player welcome
     [SerializeField] private TextMeshProUGUI levelStatisticsText; // Text that shows statistics of the level
     [SerializeField] private Button playLevelButton; // Button to play the level
+    [SerializeField] private GameObject GameWonUIObject;
 
     [Header("Scene Level Attributes")]
     public float sceneFadeInSpeed;
@@ -40,6 +41,7 @@ public class LevelSceneController : MonoBehaviour
         welcomeText.alpha = 0f;
         levelStatisticsText.alpha = 0f;
         playLevelButton.gameObject.SetActive(false);
+        GameWonUIObject.SetActive(false);
 
         cameraPosition = cameraTransform.position;
     }
@@ -50,17 +52,23 @@ public class LevelSceneController : MonoBehaviour
     /// </summary>
     public void GoThroughLevelScene()
     {
-        CenterOnCurrentLevel();
-        InitializeTexts();
-        StartCoroutine(FadeInLevelScene()); // START BY FADING IN THE LEVEL SCENE
-        // IF PLAYER BEAT A LEVEL:
-            // DISPLAY LEVEL X WON TEXT, THEN FADE OUT TEXT
-            // GENERATE RANDOM NUMBER FROM 1 TO 6
-            // MOVE CAMERA UP OR DOWN THAT NUMBER OF LEVELS
-            // DISPLAY STATS OF THE LEVEL
+        PlayerData playerData = ApplicationManager.instance.GetPlayerData();
+        if (playerData.prevLevel == 100 && playerData.levelFinishedStatus == ApplicationManager.LevelFinishedStatus.Win)
+        {
+            GameWonInitiative();
+        }
+        else
+        {
+            CenterOnCurrentLevel();
+            InitializeTexts();
+            StartCoroutine(FadeInLevelScene()); // START BY FADING IN THE LEVEL SCENE
+        }
 
-        // FADE OUT
-        // CHANGE SCENE TO MAINSCENE
+    }
+
+    private void GameWonInitiative()
+    {
+        GameWonUIObject.SetActive(true);
     }
 
     /// <summary>
@@ -198,6 +206,9 @@ public class LevelSceneController : MonoBehaviour
         oldPlayerData.currentLevel = Mathf.Max(ApplicationManager.instance.GetPlayerData().currentLevel, 1);
         ApplicationManager.instance.currLevelData = levelsGenerator.levelDataArray.arrayOfLevelData[ApplicationManager.instance.GetPlayerData().currentLevel - 1];
         ApplicationManager.instance.SetPlayerData(oldPlayerData);
+
+        //print("Current level: " + oldPlayerData.currentLevel.ToString());
+        //print("Spawn rate: " + ApplicationManager.instance.currLevelData.secondsToSpawn);
         StartCoroutine(FadeInLevelsText());
     }
 
@@ -257,17 +268,17 @@ public class LevelSceneController : MonoBehaviour
         LevelData currLevel = levelsGenerator.levelDataArray.arrayOfLevelData[currLevelIndex-1];
         LevelData prevLevel = levelsGenerator.levelDataArray.arrayOfLevelData[prevLevelIndex-1];
 
-        print("currLevelIndex = " + currLevelIndex.ToString());
-        print("prevLevelIndex = " + prevLevelIndex.ToString());
+        //print("currLevelIndex = " + currLevelIndex.ToString());
+        //print("prevLevelIndex = " + prevLevelIndex.ToString());
         string differenceString = currLevelIndex > prevLevelIndex ? "+" : "-";
-        print("differenceString = " + differenceString);
+        //print("differenceString = " + differenceString);
 
-        levelStatisticsText.text = "";
+        levelStatisticsText.text = "Level " + currLevelIndex.ToString();
         
         // ADD TO THE LEVELSTATISTICSTEXT THE LEVEL ATTRIBUTES THAT HAVE GOTTEN TOUGHER
         if (currLevel.totalAmountOfEnemies != prevLevel.totalAmountOfEnemies)
         {
-            levelStatisticsText.text += differenceString + " Amount of Enemies";
+            levelStatisticsText.text += "\n" + differenceString + " Amount of Enemies";
         } if (currLevel.enemyDamageBoost != prevLevel.enemyDamageBoost)
         {
             levelStatisticsText.text += "\n" + differenceString + " Enemy Damage";

@@ -11,7 +11,6 @@ public class EnemyHealthController : MonoBehaviour
     
     [Header("Combonents and Objects")]
     [SerializeField] private SpriteRenderer spriteRenderer;
-    [SerializeField] private GameObject coinObject;
     [SerializeField] private GameObject damageIndicatorPrefab;
     [SerializeField] private TextMeshPro numberOfEnemiesLeftText;
                      private TextMeshPro damageIndicatorText;
@@ -77,9 +76,6 @@ public class EnemyHealthController : MonoBehaviour
 
         // Remove the Damage Indicator
         Destroy(damageIndicatorObject);
-
-        // Spawn in the coin
-        Instantiate(coinObject, transform.position, transform.rotation);
 
         // Die
         Destroy(gameObject);

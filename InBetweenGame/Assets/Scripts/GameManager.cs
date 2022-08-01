@@ -7,8 +7,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject gameRunningUI; // The UI which is visible when the game is running
     [SerializeField] private GameObject gameOverUI; // The UI which is visible when the player is dead
     [SerializeField] private GameObject gameWonUI; // The UI which is visible when the player has beaten the level
-    [SerializeField] private GameObject upgradeUI;
-    [SerializeField] private TextMeshProUGUI coinAmountText;
     [SerializeField] private TextMeshProUGUI enemyCountText;
     [SerializeField] private CanvasFunctions canvasFunctions;
 
@@ -32,7 +30,6 @@ public class GameManager : MonoBehaviour
         gameRunningUI.SetActive(true); // Making sure
         gameOverUI.SetActive(false); // Making sure
         gameWonUI.SetActive(false);
-        upgradeUI.SetActive(false);
 
         // SET UP NECESSARY VALUES REGARDING THE LEVEL
 
@@ -60,20 +57,10 @@ public class GameManager : MonoBehaviour
     {
         gameRunningUI.SetActive(false);
         gameOverUI.SetActive(true);
-        canvasFunctions.ActivateUpgradeUI();
         PlayerData oldPlayerData = ApplicationManager.instance.GetPlayerData();
         oldPlayerData.levelFinishedStatus = ApplicationManager.LevelFinishedStatus.Loss;
         ApplicationManager.instance.SetPlayerData(oldPlayerData);
         OnLevelFinish(ApplicationManager.LevelFinishedStatus.Loss);
-    }
-
-    /// <summary>
-    /// Add 1 coin to the player's coin count
-    /// </summary>
-    public void AddCoins(int amount)
-    {
-        ApplicationManager.instance.addCoins(amount);
-        coinAmountText.text = ApplicationManager.instance.GetPlayerData().coins.ToString() + " c";
     }
 
 
@@ -94,9 +81,9 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void OnPlayerWin()
     {
-        gameRunningUI.SetActive(false);
-        gameWonUI.SetActive(true);
-        canvasFunctions.ActivateUpgradeUI();
+        if (gameOverUI.activeSelf) { return; }
+        if (gameRunningUI != null) { gameRunningUI.SetActive(false); }
+        if (gameWonUI != null) { gameWonUI.SetActive(true); }
         PlayerData oldPlayerData = ApplicationManager.instance.GetPlayerData();
         oldPlayerData.levelFinishedStatus = ApplicationManager.LevelFinishedStatus.Win;
         ApplicationManager.instance.SetPlayerData(oldPlayerData);

@@ -101,9 +101,6 @@ public class ParentEnemyController : MonoBehaviour
         // Paralyze the enemy
         if (paralyzeCoroutine != null) { StopCoroutine(paralyzeCoroutine); } // Stop previous paralyzation if it is currently active
         paralyzeCoroutine = StartCoroutine(ParalyzeCor(GameManager.instance.shieldControllerScript.enemyParalyzationSeconds)); // Start paralyzing the enemy
-
-        // Call the playercombat script through the shield object to make the player lose the correct amount of energy
-        GameManager.instance.playerCombatScript.OnShieldProtect();
     }
 
     /// <summary>
@@ -183,7 +180,10 @@ public class ParentEnemyController : MonoBehaviour
             {
                 StartCoroutine(PlayerShieldModeCor());
             }
-            GameManager.instance.playerMovementScript.OnStaminaShieldProtect();
+            else
+            {
+                GameManager.instance.playerMovementScript.playerRanIntoUnparalyzedEnemy = true;
+            }
         }
         else if (!isParalyzed) // Player does not have stamina shield active so hurt him!
         {

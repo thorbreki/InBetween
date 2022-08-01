@@ -9,23 +9,8 @@ public class CanvasFunctions : MonoBehaviour
 {
     [Header("Gun Mode Text")]
     [SerializeField] private TextMeshProUGUI gunModeText;
-    [SerializeField] private GameObject upgradeUIObject;
 
     private Coroutine displayGunModeTextCoroutine;
-
-    [Header("Upgrade UI")]
-    [SerializeField] private RectTransform pistolAccuracyProgressBar;
-
-    private PlayerData basePlayerSkills;
-    private PlayerData maxPlayerSkills;
-
-    private Vector3 progressBarScaleVector;
-
-    [HideInInspector]
-    public enum UpgradeType
-    {
-        pistolAccuracy = 0
-    }
 
     private void Start()
     {
@@ -33,11 +18,6 @@ public class CanvasFunctions : MonoBehaviour
 
         // Initialize some stuff
         gunModeText.gameObject.SetActive(false);
-
-        basePlayerSkills = ApplicationManager.instance.GetBasePlayerData();
-        maxPlayerSkills = ApplicationManager.instance.GetMaxedOutPlayerData();
-
-        progressBarScaleVector = new Vector3(1, 1, 1);
     }
     /// <summary>
     /// Player can restart the game
@@ -60,7 +40,7 @@ public class CanvasFunctions : MonoBehaviour
         print("GOING TO LEVEL SCENE!");
         Color overlayColor = inputRawImage.color;
         float initial = inputRawImage.color.a;
-        print("INITIAL: " + initial.ToString());
+        //print("INITIAL: " + initial.ToString());
         float target = 1f;
         float t = 0;
 
@@ -89,44 +69,5 @@ public class CanvasFunctions : MonoBehaviour
         gunModeText.gameObject.SetActive(true);
         yield return new WaitForSeconds(2f);
         gunModeText.gameObject.SetActive(false);
-    }
-
-
-    // --------- UPGRADEUI FUNCTIONS AND FUNCTIONALITY
-    public void ActivateUpgradeUI()
-    {
-        InitializeUpgradeUI();
-        upgradeUIObject.SetActive(true);
-
-    }
-
-    /// <summary>
-    /// Before UpgradeUI gets activated, the scale of all the progressbars must be correct
-    /// </summary>
-    private void InitializeUpgradeUI()
-    {
-        // Pistol Accuracy
-        SetProgressBarScale(pistolAccuracyProgressBar, ApplicationManager.instance.GetPlayerData().pistolAccuracy, 3, 0);
-    }
-
-    public void UpgradeAbility(int type)
-    {
-        switch (type)
-        {
-            case (int)UpgradeType.pistolAccuracy:
-                ApplicationManager.instance.upgradePistolAccuracy();
-                break;
-            default:
-                ApplicationManager.instance.upgradePistolAccuracy();
-                break;
-        }
-    }
-
-    private void SetProgressBarScale(RectTransform theProgressBar, float currValue, float maxValue, float minValue)
-    {
-        float maxDifference = Mathf.Abs(maxValue - minValue);
-        float currDifference = Mathf.Abs(maxValue - currValue);
-        progressBarScaleVector.x = currDifference / maxDifference;
-        theProgressBar.localScale = progressBarScaleVector;
     }
 }
